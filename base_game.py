@@ -1,14 +1,18 @@
 import os
 import pygame
 import math
+import sys
+
 pygame.font.init()
 pygame.mixer.init()
 MAX_BULLETS = 10
 WHITE = (255,255,255)
+BLACK = (0,0,0)
 FPS=60
 WIDTH,HEIGHT = 900,500
 
 WIN = pygame.display.set_mode((WIDTH,HEIGHT))
+#MENUSCREEN = pygame.display.set_mode((WIDTH,HEIGHT))
 #global player constants
 PLAYER_WIDTH, PLAYER_HEIGHT = 55,40
 #player1 constants
@@ -128,6 +132,7 @@ def draw_winner(text):
     pygame.display.update()
     pygame.time.delay(2000)
 
+
 def draw_window(p1,p2,p1_b,p2_b,line,bullet1,bullet2,p1_hp,p2_hp):
     #draw background
     WIN.blit(BG_IMAGE,(0,0))
@@ -150,19 +155,73 @@ def draw_window(p1,p2,p1_b,p2_b,line,bullet1,bullet2,p1_hp,p2_hp):
     #update each frame
     pygame.display.update()
 
+def draw_text(text, font, color, surface, x, y):
+    textobj = font.render(text, 1, color)
+    textrect = textobj.get_rect()
+    textrect.topleft = (x, y)
+    surface.blit(textobj, textrect)
+
+
 def main():
+    click = False
+    while True:
+ 
+        WIN.fill(BLACK)
+        draw_text('main menu', HEALTH_FONT, (255, 255, 255), WIN, 20, 20)
+ 
+        mx, my = pygame.mouse.get_pos()
+ 
+        game_start_button = pygame.Rect(50, 100, 200, 50)
+        controls_button = pygame.Rect(50, 200, 200, 50)
+        credits_button = pygame.Rect(50, 300, 200, 50)
+
+        
+
+        if game_start_button.collidepoint((mx, my)):
+            if click:
+                game()
+        if controls_button.collidepoint((mx, my)):
+            if click:
+                controls() 
+        if credits_button.collidepoint((mx, my)):
+            if click:
+                credit() 
+        pygame.draw.rect(WIN, (255, 0, 0), game_start_button)
+        pygame.draw.rect(WIN, (255, 0, 0), controls_button)
+        pygame.draw.rect(WIN, (255, 0, 0), credits_button)
+
+        draw_text('Play', HEALTH_FONT, (255, 255, 255), WIN, 50, 100)
+        draw_text('Controls', HEALTH_FONT, (255, 255, 255), WIN, 50, 200)
+        draw_text('Credits', HEALTH_FONT, (255, 255, 255), WIN, 50, 300)
+ 
+        click = False
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    pygame.quit()
+                    sys.exit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    click = True
+        pygame.display.update()
+
+def game():
     player1 = pygame.Rect(700,300,PLAYER_WIDTH,PLAYER_HEIGHT)
     player2 = pygame.Rect(100,300,PLAYER_WIDTH,PLAYER_HEIGHT)
     bullet1 = bullet(player1.x, player1.y+player1.height//2 -2,5,WHITE)
     bullet2 = bullet(player2.x+player2.width-8, player2.y+player2.height//2 -2,5,WHITE)
     #bullet = pygame.Rect(player2.x+player2.width, player2.y+player2.height//2 -2 , 10 , 5)
+
     x = 0
     y = 0
     time = 0
     power = 0
     angle = 0
     shoot= False
-
+    click = False
     #bullets for players
     p1_bullets = []
     p2_bullets = []
@@ -190,14 +249,18 @@ def main():
         line1 = [(player1.x, player1.y+player1.height//2 -2),pos]
         line2 = [(player2.x+player2.width-8,player2.y+player2.height//2 -2),pos]
         clock.tick(FPS)
+        click=False
         for event in pygame.event.get():
             #press close window event
             if event.type == pygame.QUIT:
                 run = False
             #keypress event
             if event.type == pygame.KEYDOWN:
-                print("hi")
+                if event.key == pygame.K_ESCAPE:
+                    main()
             if event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    click = True
                 if shoot == False:
                     BULLET_FIRE_SOUND.play()
                     shoot = True
@@ -241,9 +304,48 @@ def main():
         player2_move(keys_pressed,player2,bullet2)
 
         handle_bullets(p1_bullets,p2_bullets,player1,player2,bullet2)
-
         draw_window(player1,player2,p1_bullets,p2_bullets,line2,bullet1,bullet2,p1_hp,p2_hp)
     pygame.quit()
 
+def controls():
+    running = True
+    while running:
+        WIN.fill((0,0,0))
+ 
+        draw_text('Controls', HEALTH_FONT, (255, 255, 255), WIN, 20, 20)
+        draw_text('Use Mouse to Shoot', HEALTH_FONT, (255, 255, 255), WIN, 20, 100)
+        draw_text('Player 1 uses a and d to move left and right', HEALTH_FONT, (255, 255, 255), WIN, 20, 200)
+        draw_text('Player 2 uses left arrow key and right arrow key ', HEALTH_FONT, (255, 255, 255), WIN, 20, 300)
+        draw_text('to move left and right', HEALTH_FONT, (255, 255, 255), WIN, 20, 400)
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    running = False
+        
+        pygame.display.update()
+
+def credit():
+    running = True
+    while running:
+        WIN.fill((0,0,0))
+ 
+        draw_text('Credits', HEALTH_FONT, (255, 255, 255), WIN, 20, 20)
+        draw_text('Ryan Choy, 014499316', HEALTH_FONT, (255, 255, 255), WIN, 50, 100)
+        draw_text('Jannarthana, ID number', HEALTH_FONT, (255, 255, 255), WIN, 50, 200)
+        draw_text('Premchand, ID number', HEALTH_FONT, (255, 255, 255), WIN, 50, 300)
+        draw_text('William, ID number', HEALTH_FONT, (255, 255, 255), WIN, 50, 400)
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    running = False
+        
+        pygame.display.update()
+
 if __name__ == "__main__":
-    main()
+    main() 
