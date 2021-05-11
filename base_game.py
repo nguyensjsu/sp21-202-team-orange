@@ -334,7 +334,7 @@ def credit():
  
         draw_text('Credits', HEALTH_FONT, (255, 255, 255), WIN, 20, 20)
         draw_text('Ryan Choy, 014499316', HEALTH_FONT, (255, 255, 255), WIN, 50, 100)
-        draw_text('Jannarthana, ID number', HEALTH_FONT, (255, 255, 255), WIN, 50, 200)
+        draw_text('Janaarthana Harri, 015246205', HEALTH_FONT, (255, 255, 255), WIN, 50, 200)
         draw_text('Premchand, ID number', HEALTH_FONT, (255, 255, 255), WIN, 50, 300)
         draw_text('William, ID number', HEALTH_FONT, (255, 255, 255), WIN, 50, 400)
         for event in pygame.event.get():
