@@ -40,20 +40,11 @@ BULLET_HIT_SOUND = pygame.mixer.Sound(os.path.join("images","Assets_Grenade+1.mp
 BULLET_FIRE_SOUND = pygame.mixer.Sound(os.path.join("images","Assets_Gun+Silencer.mp3"))
 
 BG_IMAGE = pygame.transform.scale(pygame.image.load(os.path.join("images","background.jpg")),(WIDTH,HEIGHT))
-#pygame.mouse.set_visible(False)
 
 pygame.display.set_caption("Worms")
 
 use_snow = True
 snow_list = []
-
-#class Crosshair(pygame.sprite.Sprite):
-#    def __init__(self,picture_path):
-#        super().__init__()
-#        self.image = pygame.image.load(picture_path)
-#        self.rect = self.image.get_rect()
-#    def update(self):
-#        self.rect.center = pygame.mouse.get_pos()
 
 class bullet(object):
     def __init__(self, x,y , radius, color):
@@ -115,8 +106,6 @@ def handle_bullets(p1_b,p2_b,p1,p2,bullet):
         #pygame.event.post(pygame.event.Event(PLAYER2_HIT))
     pass
     
-    
-
 
 def findAngle(pos,p1,p2):
     #player 1
@@ -162,9 +151,6 @@ def draw_window(p1,p2,p1_b,p2_b,line,bullet1,bullet2,p1_hp,p2_hp):
     WIN.blit(PLAYER1,(p1.x,p1.y))                        
     WIN.blit(PLAYER2,(p2.x,p2.y))  
 
-
-        
-
     #pygame.draw.line(WIN,WHITE,line[0],line[1])
 
     #update each frame
@@ -188,8 +174,6 @@ def draw_snow():
             snow_list[i][0] = x
             snow_list[i][1] = y
 
-    
-
     pygame.display.update()    
 
 def main():
@@ -201,13 +185,11 @@ def main():
  
         mx, my = pygame.mouse.get_pos()
 
-         
         game_start_button = pygame.Rect(50, 100, 200, 50)
         controls_button = pygame.Rect(50, 200, 200, 50)
         credits_button = pygame.Rect(50, 300, 200, 50)
 
         
-
         if game_start_button.collidepoint((mx, my)):
             if click:
                 game()
@@ -245,10 +227,7 @@ def game():
     player2 = pygame.Rect(100,300,PLAYER_WIDTH,PLAYER_HEIGHT)
     bullet1 = bullet(player1.x, player1.y+player1.height//2 -2,5, RED)
     bullet2 = bullet(player2.x+player2.width-8, player2.y+player2.height//2 -2,5, RED)
-    #crosshair
-    #crosshair = Crosshair(os.path.join("images","crosshair.png"))
-    #crosshair_group = pygame.sprite.Group()
-    #crosshair_group.add(crosshair)
+
     #bullet = pygame.Rect(player2.x+player2.width, player2.y+player2.height//2 -2 , 10 , 5)
 
     x = 0
@@ -296,8 +275,6 @@ def game():
         #invisible line determining the angle of the projectile
         line1 = [(player1.x, player1.y+player1.height//2 -2),pos]
         line2 = [(player2.x+player2.width-8,player2.y+player2.height//2 -2),pos]
-        #crosshair_group.draw(WIN)
-        #crosshair_group.update()
         clock.tick(FPS)
         click=False
         for event in pygame.event.get():
