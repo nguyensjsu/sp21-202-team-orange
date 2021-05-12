@@ -38,8 +38,11 @@ WINNER_FONT = pygame.font.SysFont("Times New Roman",100)
 #sound
 BULLET_HIT_SOUND = pygame.mixer.Sound(os.path.join("images","Assets_Grenade+1.mp3"))
 BULLET_FIRE_SOUND = pygame.mixer.Sound(os.path.join("images","Assets_Gun+Silencer.mp3"))
-
-BG_IMAGE = pygame.transform.scale(pygame.image.load(os.path.join("images","background.jpg")),(WIDTH,HEIGHT))
+MAIN_BG_SOUND = pygame.mixer.Sound(os.path.join("images", "Main_BG.ogg" ))
+GAME_BG_SOUND = pygame.mixer.Sound(os.path.join("images","Game_BG.ogg"))
+#Backgrounds
+GAME_IMAGE = pygame.transform.scale(pygame.image.load(os.path.join("images","BG.png")),(WIDTH,HEIGHT))
+MAIN_IMAGE = pygame.transform.scale(pygame.image.load(os.path.join("images","background.jpg")),(WIDTH,HEIGHT))
 
 pygame.display.set_caption("Worms")
 
@@ -138,7 +141,7 @@ def draw_winner(text):
 
 def draw_window(p1,p2,p1_b,p2_b,line,bullet1,bullet2,p1_hp,p2_hp):
     #draw background
-    WIN.blit(BG_IMAGE,(0,0))
+    WIN.blit(GAME_IMAGE,(0,0))
     #draw player health bars
     p1_health_text = HEALTH_FONT.render("Health: "+ str(p1_hp),1,WHITE)
     p2_health_text = HEALTH_FONT.render("Health: "+ str(p2_hp),1,WHITE)
@@ -179,9 +182,11 @@ def draw_snow():
 def main():
     click = False
     while True:
- 
-        WIN.fill(BLACK)
+        
+        WIN.blit(MAIN_IMAGE,(0,0))
         draw_text('main menu', HEALTH_FONT, WHITE, WIN, 20, 20)
+
+        MAIN_BG_SOUND.play()
  
         mx, my = pygame.mouse.get_pos()
 
@@ -227,6 +232,10 @@ def game():
     player2 = pygame.Rect(100,300,PLAYER_WIDTH,PLAYER_HEIGHT)
     bullet1 = bullet(player1.x, player1.y+player1.height//2 -2,5, RED)
     bullet2 = bullet(player2.x+player2.width-8, player2.y+player2.height//2 -2,5, RED)
+    
+    MAIN_BG_SOUND.stop()
+    GAME_BG_SOUND.play()
+
 
     #bullet = pygame.Rect(player2.x+player2.width, player2.y+player2.height//2 -2 , 10 , 5)
 
@@ -333,6 +342,7 @@ def game():
 
         handle_bullets(p1_bullets,p2_bullets,player1,player2,bullet2)
         draw_window(player1,player2,p1_bullets,p2_bullets,line2,bullet1,bullet2,p1_hp,p2_hp)
+        
 
 
     pygame.quit()
