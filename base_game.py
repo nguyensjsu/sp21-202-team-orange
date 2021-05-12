@@ -2,12 +2,14 @@ import os
 import pygame
 import math
 import sys
+import random
 
 pygame.font.init()
 pygame.mixer.init()
 MAX_BULLETS = 10
 WHITE = (255,255,255)
 BLACK = (0,0,0)
+RED = (255,0,0)
 FPS=60
 WIDTH,HEIGHT = 900,500
 
@@ -38,8 +40,20 @@ BULLET_HIT_SOUND = pygame.mixer.Sound(os.path.join("images","Assets_Grenade+1.mp
 BULLET_FIRE_SOUND = pygame.mixer.Sound(os.path.join("images","Assets_Gun+Silencer.mp3"))
 
 BG_IMAGE = pygame.transform.scale(pygame.image.load(os.path.join("images","background.jpg")),(WIDTH,HEIGHT))
+#pygame.mouse.set_visible(False)
 
 pygame.display.set_caption("Worms")
+
+use_snow = True
+snow_list = []
+
+#class Crosshair(pygame.sprite.Sprite):
+#    def __init__(self,picture_path):
+#        super().__init__()
+#        self.image = pygame.image.load(picture_path)
+#        self.rect = self.image.get_rect()
+#    def update(self):
+#        self.rect.center = pygame.mouse.get_pos()
 
 class bullet(object):
     def __init__(self, x,y , radius, color):
@@ -148,6 +162,7 @@ def draw_window(p1,p2,p1_b,p2_b,line,bullet1,bullet2,p1_hp,p2_hp):
     WIN.blit(PLAYER1,(p1.x,p1.y))                        
     WIN.blit(PLAYER2,(p2.x,p2.y))  
 
+
         
 
     #pygame.draw.line(WIN,WHITE,line[0],line[1])
@@ -161,16 +176,32 @@ def draw_text(text, font, color, surface, x, y):
     textrect.topleft = (x, y)
     surface.blit(textobj, textrect)
 
+def draw_snow():
+
+    for i in range (len(snow_list)):
+        pygame.draw.circle(WIN, WHITE, snow_list[i], 2)
+        snow_list[i][1] += 1
+
+        if (snow_list[i][1] > HEIGHT):
+            y = random.randrange(-20, 0)
+            x = random.randrange(0, WIDTH)
+            snow_list[i][0] = x
+            snow_list[i][1] = y
+
+    
+
+    pygame.display.update()    
 
 def main():
     click = False
     while True:
  
         WIN.fill(BLACK)
-        draw_text('main menu', HEALTH_FONT, (255, 255, 255), WIN, 20, 20)
+        draw_text('main menu', HEALTH_FONT, WHITE, WIN, 20, 20)
  
         mx, my = pygame.mouse.get_pos()
- 
+
+         
         game_start_button = pygame.Rect(50, 100, 200, 50)
         controls_button = pygame.Rect(50, 200, 200, 50)
         credits_button = pygame.Rect(50, 300, 200, 50)
@@ -206,13 +237,18 @@ def main():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
                     click = True
+
         pygame.display.update()
 
 def game():
     player1 = pygame.Rect(700,300,PLAYER_WIDTH,PLAYER_HEIGHT)
     player2 = pygame.Rect(100,300,PLAYER_WIDTH,PLAYER_HEIGHT)
-    bullet1 = bullet(player1.x, player1.y+player1.height//2 -2,5,WHITE)
-    bullet2 = bullet(player2.x+player2.width-8, player2.y+player2.height//2 -2,5,WHITE)
+    bullet1 = bullet(player1.x, player1.y+player1.height//2 -2,5, RED)
+    bullet2 = bullet(player2.x+player2.width-8, player2.y+player2.height//2 -2,5, RED)
+    #crosshair
+    #crosshair = Crosshair(os.path.join("images","crosshair.png"))
+    #crosshair_group = pygame.sprite.Group()
+    #crosshair_group.add(crosshair)
     #bullet = pygame.Rect(player2.x+player2.width, player2.y+player2.height//2 -2 , 10 , 5)
 
     x = 0
@@ -229,10 +265,22 @@ def game():
     p1_hp = 100
     p2_hp = 100
 
+    #Setup snow
+    if (use_snow):
+        for i in range(60):
+            x = random.randrange(0, WIDTH)
+            y = random.randrange(0, HEIGHT)
+            snow_list.append([x,y])
+
     #control fps
     clock = pygame.time.Clock()
     run = True
     while run:
+
+        #Update the snow flakes
+        if (use_snow):
+            draw_snow()
+        
         if shoot:
             if bullet2.y <500 - bullet2.radius:
                 time += 0.05
@@ -248,6 +296,8 @@ def game():
         #invisible line determining the angle of the projectile
         line1 = [(player1.x, player1.y+player1.height//2 -2),pos]
         line2 = [(player2.x+player2.width-8,player2.y+player2.height//2 -2),pos]
+        #crosshair_group.draw(WIN)
+        #crosshair_group.update()
         clock.tick(FPS)
         click=False
         for event in pygame.event.get():
@@ -283,6 +333,7 @@ def game():
                     time = 0
                     power = math.sqrt((line2[1][1]-line2[0][1])**2 +(line2[1][0]-line2[0][0])**2)/8
                     angle = findAngle(pos,player1,bullet2)
+
             if event.type  == PLAYER1_HIT:
                 p1_hp -= 10
 
@@ -305,6 +356,8 @@ def game():
 
         handle_bullets(p1_bullets,p2_bullets,player1,player2,bullet2)
         draw_window(player1,player2,p1_bullets,p2_bullets,line2,bullet1,bullet2,p1_hp,p2_hp)
+
+
     pygame.quit()
 
 def controls():
