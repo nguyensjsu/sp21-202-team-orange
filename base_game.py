@@ -1,4 +1,4 @@
-audio_compat = True #Set False if audio works for you; pygame has audio problems on my desktop.
+audio_compat = True #Set False if audio works for you; pygame has audio problems on my desktop. -William
 
 import os
 import pygame
@@ -9,25 +9,12 @@ import os
 
 pygame.font.init()
 if not audio_compat: pygame.mixer.init()
-# MAX_BULLETS = 10
-# General constants
+# General game attributes
 WHITE = (255,255,255)
 BLACK = (0,0,0)
 RED = (255,0,0)
 FPS=60
 WIDTH,HEIGHT = 900, 500
-
-WIN = pygame.display.set_mode((WIDTH,HEIGHT))
-#MENUSCREEN = pygame.display.set_mode((WIDTH,HEIGHT))
-#object speeds
-# BULLET_SPEED = 10
-SPEED = 5
-#players getting hit event
-PLAYER1_HIT = pygame.USEREVENT + 1
-PLAYER2_HIT = pygame.USEREVENT + 2
-#player turn
-PLAYER_TURN = 2
-#fonts
 HEALTH_FONT = pygame.font.SysFont("Times New Roman",40)
 WINNER_FONT = pygame.font.SysFont("Times New Roman",100)
 #sound
@@ -39,6 +26,12 @@ if not audio_compat:
 #Backgrounds
 GAME_IMAGE = pygame.transform.scale(pygame.image.load(os.path.join("images","BG.png")),(WIDTH,HEIGHT))
 MAIN_IMAGE = pygame.transform.scale(pygame.image.load(os.path.join("images","background.jpg")),(WIDTH,HEIGHT))
+
+WIN = pygame.display.set_mode((WIDTH,HEIGHT))
+#MENUSCREEN = pygame.display.set_mode((WIDTH,HEIGHT))
+#players getting hit event
+PLAYER1_HIT = pygame.USEREVENT + 1
+PLAYER2_HIT = pygame.USEREVENT + 2
 
 pygame.display.set_caption("Worms")
 use_snow = True
@@ -67,7 +60,7 @@ class Bullet(object):
         newX = round(distX + x)
         newY = round(y - distY)
 
-        return (newX,newY)
+        return newX, newY
 
 
 class Player:
@@ -84,30 +77,16 @@ class Player:
         self.bullet = Bullet(self.x + self.width // 2, self.y + self.height // 2, 5, RED)
 
     def move_left(self):
-        if self.x - SPEED > 0:
+        if self.x - self.speed > 0:
             self.x -= self.speed
             self.bullet.x -= self.speed
     def move_right(self):
-        if self.x + SPEED + self.width < WIDTH :
+        if self.x + self.speed + self.width < WIDTH :
             self.x += self.speed
             self.bullet.x += self.speed
-
-
-# def player1_move(keys_pressed,player1,bullet):
-#     if keys_pressed[pygame.K_LEFT] and player1.x - SPEED > 0:
-#         player1.x -= SPEED
-#         bullet.x -=SPEED
-#     if keys_pressed[pygame.K_RIGHT] and player1.x + SPEED + player1.width < WIDTH :
-#         player1.x += SPEED
-#         bullet.x +=SPEED
-
-# def player2_move(keys_pressed,player2,bullet):
-#     if keys_pressed[pygame.K_a] and player2.x - SPEED > 0:                #a is pressed
-#         player2.x -= SPEED
-#         bullet.x -=SPEED
-#     if keys_pressed[pygame.K_d] and player2.x + SPEED + player2.width < WIDTH:                #d is pressed
-#         player2.x += SPEED
-#         bullet.x +=SPEED
+    def reset_bullet(self):
+        self.bullet.x = self.x + self.width // 2
+        self.bullet.y = self.y + self.height // 2
 
 def handle_bullets(p1_b,p2_b,p1,p2,bullet):
     #for bullet in p2_b:
@@ -250,20 +229,15 @@ def main():
         pygame.display.update()
 
 def game():
-    # player1 = pygame.Rect(700,300,PLAYER_WIDTH,PLAYER_HEIGHT)
-    # player2 = pygame.Rect(100,300,PLAYER_WIDTH,PLAYER_HEIGHT)
     player1 = Player(700, 300, pygame.image.load(os.path.join("images","spaceship_red.png")))
     player2 = Player(100, 300, pygame.image.load(os.path.join("images","spaceship_yellow.png")))
-    # bullet1 = Bullet(player1.x+10 , player1.y+player1.height//2 +2,5, RED)
-    # bullet2 = Bullet(player2.x+player2.width-8, player2.y+player2.height//2 -2,5, RED)
     
     if not audio_compat:
         MAIN_BG_SOUND.stop()
         GAME_BG_SOUND.play()
-    PLAYER_TURN = 1
-
-    #bullet = pygame.Rect(player2.x+player2.width, player2.y+player2.height//2 -2 , 10 , 5)
-    
+    player_1_turn = True
+    active_player = player1
+    dormant_player = player2
     x = 0
     y = 0
     time = 0
@@ -271,12 +245,6 @@ def game():
     angle = 0
     shoot= False
     click = False
-    #bullets for players
-    # p1_bullets = []
-    # p2_bullets = []
-    #hitpoints for players
-    # p1_hp = 100
-    # p2_hp = 100
 
     #Setup snow
     if (use_snow):
@@ -294,110 +262,80 @@ def game():
         if (use_snow):
             draw_snow()
         
-        if PLAYER_TURN == 1:
-            if shoot:
-                if player1.bullet.y <500 - player2.bullet.radius:
-                    time += 0.05
-                    poss = player1.bullet.projectilePath(x,y,power,angle,time)
-                    player1.bullet.x = poss[0]
-                    player1.bullet.y = poss[1]
-                else:
-                    shoot=False
-                    PLAYER_TURN = 2
-                    player1.bullet.x = player1.x + 10
-                    player1.bullet.y = player1.y + player1.height // 2 - 2
-        if PLAYER_TURN == 2:
-            if shoot:
-                if player2.bullet.y < 500 - player2.bullet.radius:
-                    time += 0.05
-                    poss = player2.bullet.projectilePath(x, y, power, angle, time)
-                    player2.bullet.x = poss[0]
-                    player2.bullet.y = poss[1]
-                    
-                else:
-                    shoot=False
-                    PLAYER_TURN = 1
-                    player2.bullet.x = player2.x + player2.width - 8
-                    player2.bullet.y = player2.y + player2.height // 2 - 2
+        #this now uses state design pattern
+        if shoot:
+            if active_player.bullet.y < 500: #bullet is still within frame
+                time += 0.25
+                active_player.bullet.x, active_player.bullet.y = active_player.bullet.projectilePath(x, y, power, angle, time) #recalculate bullet location
+            else: #bullet has left frame boundary
+                shoot = False
+                player_1_turn = not player_1_turn 
+                active_player.reset_bullet() #retrive bullet
+                #switch active and dormant roles
+                temp = active_player
+                active_player = dormant_player
+                dormant_player = temp
                 
+
         #position of the mouse
         pos = pygame.mouse.get_pos()
         #invisible line determining the angle of the projectile
         line1 = [(player1.x + 10, player1.y + player1.height // 2 - 2), pos]
         line2 = [(player2.x + player2.width - 8, player2.y + player2.height // 2 - 2), pos]
+
         clock.tick(FPS)
-        click=False
+        click = False
         for event in pygame.event.get():
             #press close window event
             if event.type == pygame.QUIT:
                 run = False
             #keypress event
-            if event.type == pygame.KEYDOWN:
+            elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     GAME_BG_SOUND.stop()
                     main()
-            if event.type == pygame.MOUSEBUTTONDOWN:
+            elif event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
                     click = True
                 if shoot == False:
-                    print(PLAYER_TURN)
+                    if player_1_turn:
+                        print("1")
+                    else:
+                        print("2")
                     if not audio_compat: BULLET_FIRE_SOUND.play()
                     shoot = True
-                    if PLAYER_TURN == 1:
+                    if player_1_turn:
                         x = player1.bullet.x
                         y = player1.bullet.y
                         time = 0
                         power = math.sqrt((line1[1][1] - line1[0][1]) ** 2 + (line1[1][0] - line1[0][0]) ** 2) / 8
                         angle = findAngle(pos, player1, player1.bullet)
-                    if PLAYER_TURN == 2:
+                    else:
                         x = player2.bullet.x
                         y = player2.bullet.y
                         time = 0
                         power = math.sqrt((line2[1][1] - line2[0][1]) ** 2 + (line2[1][0] - line2[0][0]) ** 2) / 8
                         angle = findAngle(pos, player2, player2.bullet)
-                    
-                    #x = bullet2.x
-                    #y = bullet2.y
-                   # time = 0
-                    #power = math.sqrt((line2[1][1]-line2[0][1])**2 +(line2[1][0]-line2[0][0])**2)/8
-                    #angle = findAngle(pos,player2,bullet2)
 
-                    #x = bullet1.x
-                    #y = bullet1.y
-                    #time = 0
-                    #power = math.sqrt((line1[1][1]-line1[0][1])**2 +(line1[1][0]-line1[0][0])**2)/8
-                    #angle = findAngle(pos,player1,bullet1)
-
-            if event.type  == PLAYER1_HIT:
+            #not sure how these hit events are meant to happen; collision doesn't seem to work yet
+            elif event.type  == PLAYER1_HIT:
                 player1.hp -= 10
 
-            if event.type  == PLAYER2_HIT:
+            elif event.type  == PLAYER2_HIT:
                 player2.hp -= 10
             
-            winner_text = ""
-            if player1.hp <= 0:
-                winner_text = "PLAYER 2 WINS!"
-            if player2.hp <= 0:
-                winner_text = "PLAYER 1 WINS!"
-
-            if winner_text != "":
-                draw_winner(winner_text)
+            if active_player.hp <= 0: #if active player's HP is 0, that means the other player killed them last turn
+                draw_winner("PLAYER " + str(int(player_1_turn) + 1) + " WINS!") #simple formula to generate winning text instead of layers of conditionals
                 break
 
-        keys_pressed = pygame.key.get_pressed()
-        if keys_pressed[pygame.K_a]:
-            if PLAYER_TURN == 1:
-                player1.move_left()
-            if PLAYER_TURN == 2:
-                player2.move_left()
-        if keys_pressed[pygame.K_d]:
-            if PLAYER_TURN == 1:
-                player1.move_right()
-            if PLAYER_TURN == 2:
-                player2.move_right()
+        pressed = pygame.key.get_pressed()
+        if pressed[pygame.K_a]:
+            active_player.move_left()
+        elif pressed[pygame.K_d]:
+            active_player.move_right()
 
         # handle_bullets(player1.bullets,player2.bullets,player1.rect,player2.rect,bullet2)
-        draw_window(player1, player2, line1, line2, PLAYER_TURN)
+        draw_window(player1, player2, line1, line2, int(player_1_turn) + 1)
 
         
     pygame.quit()
@@ -406,12 +344,11 @@ def controls():
     running = True
     while running:
         WIN.fill((0,0,0))
- 
-        draw_text('Controls', HEALTH_FONT, (255, 255, 255), WIN, 20, 20)
-        draw_text('Use Mouse to Shoot', HEALTH_FONT, (255, 255, 255), WIN, 20, 100)
-        draw_text('Player 1 uses a and d to move left and right', HEALTH_FONT, (255, 255, 255), WIN, 20, 200)
-        draw_text('Player 2 uses left arrow key and right arrow key ', HEALTH_FONT, (255, 255, 255), WIN, 20, 300)
-        draw_text('to move left and right', HEALTH_FONT, (255, 255, 255), WIN, 20, 400)
+        draw_text('Controls', HEALTH_FONT, WHITE, WIN, 20, 20)
+        draw_text('Use Mouse to Shoot', HEALTH_FONT, WHITE, WIN, 20, 100)
+        draw_text('Player 1 uses a and d to move left and right', HEALTH_FONT, WHITE, WIN, 20, 200)
+        draw_text('Player 2 uses left arrow key and right arrow key ', HEALTH_FONT, WHITE, WIN, 20, 300)
+        draw_text('to move left and right', HEALTH_FONT, WHITE, WIN, 20, 400)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -426,12 +363,11 @@ def credit():
     running = True
     while running:
         WIN.fill((0,0,0))
- 
-        draw_text('Credits', HEALTH_FONT, (255, 255, 255), WIN, 20, 20)
-        draw_text('Ryan Choy, 014499316', HEALTH_FONT, (255, 255, 255), WIN, 50, 100)
-        draw_text('Janaarthana Harri, 015246205', HEALTH_FONT, (255, 255, 255), WIN, 50, 200)
-        draw_text('Premchand, ID number', HEALTH_FONT, (255, 255, 255), WIN, 50, 300)
-        draw_text('William Su, 013697658', HEALTH_FONT, (255, 255, 255), WIN, 50, 400)
+        draw_text('Credits', HEALTH_FONT, WHITE, WIN, 20, 20)
+        draw_text('Ryan Choy, 014499316', HEALTH_FONT, WHITE, WIN, 50, 100)
+        draw_text('Janaarthana Harri, 015246205', HEALTH_FONT, WHITE, WIN, 50, 200)
+        draw_text('Premchand, ID number', HEALTH_FONT, WHITE, WIN, 50, 300)
+        draw_text('William Su, 013697658', HEALTH_FONT, WHITE, WIN, 50, 400)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
