@@ -1,14 +1,11 @@
-audio_compat = True #Set False if audio works for you; pygame has audio problems on my desktop.
-
 import os
 import pygame
 import math
 import sys
 import random
-import os
 
 pygame.font.init()
-if not audio_compat: pygame.mixer.init()
+pygame.mixer.init()
 MAX_BULLETS = 10
 WHITE = (255,255,255)
 BLACK = (0,0,0)
@@ -22,9 +19,9 @@ WIN = pygame.display.set_mode((WIDTH,HEIGHT))
 PLAYER_WIDTH, PLAYER_HEIGHT = 55,40
 #player1 constants
 PLAYER1_IMAGE = pygame.image.load(os.path.join("images","spaceship_red.png"))
-PLAYER1 = pygame.transform.scale(PLAYER1_IMAGE,(PLAYER_WIDTH,PLAYER_HEIGHT))
+PLAYER1 = pygame.transform.rotate(pygame.transform.scale(PLAYER1_IMAGE,(PLAYER_WIDTH,PLAYER_HEIGHT)),90)
 #player2 constants
-PLAYER2_IMAGE = pygame.image.load(os.path.join("images","spaceship_yellow.png"))
+PLAYER2_IMAGE = pygame.transform.rotate(pygame.image.load(os.path.join("images","spaceship_yellow.png")),270)
 PLAYER2 = pygame.transform.scale(PLAYER2_IMAGE,(PLAYER_WIDTH,PLAYER_HEIGHT))
 #object speeds
 BULLET_SPEED = 10
@@ -38,20 +35,20 @@ PLAYER_TURN = 2
 HEALTH_FONT = pygame.font.SysFont("Times New Roman",40)
 WINNER_FONT = pygame.font.SysFont("Times New Roman",100)
 #sound
-if not audio_compat:
-    BULLET_HIT_SOUND = pygame.mixer.Sound(os.path.join("images","Assets_Grenade+1.mp3"))
-    BULLET_FIRE_SOUND = pygame.mixer.Sound(os.path.join("images","Assets_Gun+Silencer.mp3"))
-    MAIN_BG_SOUND = pygame.mixer.Sound(os.path.join("images", "Main_BG.ogg" ))
-    GAME_BG_SOUND = pygame.mixer.Sound(os.path.join("images","Game_BG.ogg"))
+BULLET_HIT_SOUND = pygame.mixer.Sound(os.path.join("images","Assets_Grenade+1.mp3"))
+BULLET_FIRE_SOUND = pygame.mixer.Sound(os.path.join("images","Assets_Gun+Silencer.mp3"))
+MAIN_BG_SOUND = pygame.mixer.Sound(os.path.join("images", "Main_BG.ogg" ))
+GAME_BG_SOUND = pygame.mixer.Sound(os.path.join("images","Game_BG.ogg"))
 #Backgrounds
 GAME_IMAGE = pygame.transform.scale(pygame.image.load(os.path.join("images","BG.png")),(WIDTH,HEIGHT))
 MAIN_IMAGE = pygame.transform.scale(pygame.image.load(os.path.join("images","background.jpg")),(WIDTH,HEIGHT))
 
 pygame.display.set_caption("Worms")
+
 use_snow = True
 snow_list = []
 
-class Bullet(object):
+class bullet(object):
     def __init__(self, x,y , radius, color):
         self.x = x
         self.y = y
@@ -77,42 +74,21 @@ class Bullet(object):
         return (newX,newY)
 
 
-class Player:
-    def __init__(self, x, y, image):
-        self.x = x
-        self.y = y
-        self.hp = 100
-        self.width = 55
-        self.height = 40
-        self.image = pygame.transform.scale(image,(self.width,self.height))
-        self.bullets = []
-        self.speed = 5
-        self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
-        # self.bullet = Bullet(self.x + 10, self.y + self.height // 2 + 2, 5, RED)
+def player1_move(keys_pressed,player1,bullet):
+    if keys_pressed[pygame.K_LEFT] and player1.x - SPEED > 0:
+        player1.x -= SPEED
+        bullet.x -=SPEED
+    if keys_pressed[pygame.K_RIGHT] and player1.x + SPEED + player1.width < WIDTH :
+        player1.x += SPEED
+        bullet.x +=SPEED
 
-    def move_left(self):
-        if self.x - SPEED > 0:
-            self.x -= self.speed
-    def move_right(self):
-        if self.x + SPEED + self.width < WIDTH :
-            self.x += self.speed
-
-
-# def player1_move(keys_pressed,player1,bullet):
-#     if keys_pressed[pygame.K_LEFT] and player1.x - SPEED > 0:
-#         player1.x -= SPEED
-#         bullet.x -=SPEED
-#     if keys_pressed[pygame.K_RIGHT] and player1.x + SPEED + player1.width < WIDTH :
-#         player1.x += SPEED
-#         bullet.x +=SPEED
-
-# def player2_move(keys_pressed,player2,bullet):
-#     if keys_pressed[pygame.K_a] and player2.x - SPEED > 0:                #a is pressed
-#         player2.x -= SPEED
-#         bullet.x -=SPEED
-#     if keys_pressed[pygame.K_d] and player2.x + SPEED + player2.width < WIDTH:                #d is pressed
-#         player2.x += SPEED
-#         bullet.x +=SPEED
+def player2_move(keys_pressed,player2,bullet):
+    if keys_pressed[pygame.K_a] and player2.x - SPEED > 0:                #a is pressed
+        player2.x -= SPEED
+        bullet.x -=SPEED
+    if keys_pressed[pygame.K_d] and player2.x + SPEED + player2.width < WIDTH:                #d is pressed
+        player2.x += SPEED
+        bullet.x +=SPEED
 
 def handle_bullets(p1_b,p2_b,p1,p2,bullet):
     #for bullet in p2_b:
@@ -164,7 +140,7 @@ def draw_winner(text):
     pygame.time.delay(2000)
 
 
-def draw_window(p1,p2,line,line2,bullet1,bullet2,p1_hp,p2_hp,turn):
+def draw_window(p1,p2,p1_b,p2_b,line,line2,bullet1,bullet2,p1_hp,p2_hp,turn):
     #draw background
     WIN.blit(GAME_IMAGE,(0,0))
     #draw player health bars
@@ -200,6 +176,7 @@ def draw_text(text, font, color, surface, x, y):
     surface.blit(textobj, textrect)
 
 def draw_snow():
+
     for i in range (len(snow_list)):
         pygame.draw.circle(WIN, WHITE, snow_list[i], 2)
         snow_list[i][1] += 1
@@ -219,7 +196,7 @@ def main():
         WIN.blit(MAIN_IMAGE,(0,0))
         draw_text('main menu', HEALTH_FONT, WHITE, WIN, 20, 20)
 
-        if not audio_compat: MAIN_BG_SOUND.play()
+        MAIN_BG_SOUND.play()
  
         mx, my = pygame.mouse.get_pos()
 
@@ -261,16 +238,13 @@ def main():
         pygame.display.update()
 
 def game():
-    # player1 = pygame.Rect(700,300,PLAYER_WIDTH,PLAYER_HEIGHT)
-    # player2 = pygame.Rect(100,300,PLAYER_WIDTH,PLAYER_HEIGHT)
-    player1 = Player(700, 300, pygame.image.load(os.path.join("images","spaceship_red.png")))
-    player2 = Player(100, 3000, pygame.image.load(os.path.join("images","spaceship_yellow.png")))
-    bullet1 = Bullet(player1.x+10 , player1.y+player1.height//2 +2,5, RED)
-    bullet2 = Bullet(player2.x+player2.width-8, player2.y+player2.height//2 -2,5, RED)
+    player1 = pygame.Rect(700,300,PLAYER_WIDTH,PLAYER_HEIGHT)
+    player2 = pygame.Rect(100,300,PLAYER_WIDTH,PLAYER_HEIGHT)
+    bullet1 = bullet(player1.x+10 , player1.y+player1.height//2 +2,5, RED)
+    bullet2 = bullet(player2.x+player2.width-8, player2.y+player2.height//2 -2,5, RED)
     
-    if not audio_compat:
-        MAIN_BG_SOUND.stop()
-        GAME_BG_SOUND.play()
+    MAIN_BG_SOUND.stop()
+    GAME_BG_SOUND.play()
     PLAYER_TURN = 1
 
     #bullet = pygame.Rect(player2.x+player2.width, player2.y+player2.height//2 -2 , 10 , 5)
@@ -283,11 +257,11 @@ def game():
     shoot= False
     click = False
     #bullets for players
-    # p1_bullets = []
-    # p2_bullets = []
+    p1_bullets = []
+    p2_bullets = []
     #hitpoints for players
-    # p1_hp = 100
-    # p2_hp = 100
+    p1_hp = 100
+    p2_hp = 100
 
     #Setup snow
     if (use_snow):
@@ -313,15 +287,16 @@ def game():
                     bullet1.x = poss[0]
                     bullet1.y = poss[1]
                 else:
+                    
                     shoot=False
                     PLAYER_TURN = 2
-                    bullet1.x = player1.x + 10
-                    bullet1.y = player1.y + player1.height // 2 - 2
+                    bullet1.x = player1.x +10
+                    bullet1.y = player1.y+player1.height//2 -2
         if PLAYER_TURN == 2:
             if shoot:
-                if bullet2.y < 500 - bullet2.radius:
+                if bullet2.y <500 - bullet2.radius:
                     time += 0.05
-                    poss = bullet2.projectilePath(x, y, power, angle, time)
+                    poss = bullet2.projectilePath(x,y,power,angle,time)
                     bullet2.x = poss[0]
                     bullet2.y = poss[1]
                     
@@ -329,14 +304,14 @@ def game():
                     shoot=False
                     PLAYER_TURN = 1
                     
-                    bullet2.x = player2.x + player2.width - 8
-                    bullet2.y = player2.y + player2.height // 2 - 2
+                    bullet2.x = player2.x+player2.width-8
+                    bullet2.y = player2.y+player2.height//2 -2
                 
         #position of the mouse
         pos = pygame.mouse.get_pos()
         #invisible line determining the angle of the projectile
-        line1 = [(player1.x + 10, player1.y + player1.height // 2 - 2), pos]
-        line2 = [(player2.x + player2.width - 8, player2.y + player2.height // 2 - 2), pos]
+        line1 = [(player1.x+10, player1.y+player1.height//2 -2),pos]
+        line2 = [(player2.x+player2.width-8,player2.y+player2.height//2 -2),pos]
         clock.tick(FPS)
         click=False
         for event in pygame.event.get():
@@ -353,20 +328,20 @@ def game():
                     click = True
                 if shoot == False:
                     print(PLAYER_TURN)
-                    if not audio_compat: BULLET_FIRE_SOUND.play()
+                    BULLET_FIRE_SOUND.play()
                     shoot = True
                     if PLAYER_TURN == 1:
                         x = bullet1.x
                         y = bullet1.y
                         time = 0
-                        power = math.sqrt((line1[1][1] - line1[0][1]) ** 2 + (line1[1][0] - line1[0][0]) ** 2) / 8
-                        angle = findAngle(pos, player1, bullet1)
+                        power = math.sqrt((line1[1][1]-line1[0][1])**2 +(line1[1][0]-line1[0][0])**2)/8
+                        angle = findAngle(pos,player1,bullet1)
                     if PLAYER_TURN == 2:
                         x = bullet2.x
                         y = bullet2.y
                         time = 0
-                        power = math.sqrt((line2[1][1] - line2[0][1]) ** 2 + (line2[1][0] - line2[0][0]) ** 2) / 8
-                        angle = findAngle(pos, player2, bullet2)
+                        power = math.sqrt((line2[1][1]-line2[0][1])**2 +(line2[1][0]-line2[0][0])**2)/8
+                        angle = findAngle(pos,player2,bullet2)
                     
                     #x = bullet2.x
                     #y = bullet2.y
@@ -381,15 +356,15 @@ def game():
                     #angle = findAngle(pos,player1,bullet1)
 
             if event.type  == PLAYER1_HIT:
-                player1.hp -= 10
+                p1_hp -= 10
 
             if event.type  == PLAYER2_HIT:
-                player2.hp -= 10
+                p2_hp -= 10
             
             winner_text = ""
-            if player1.hp <= 0:
+            if p1_hp <= 0:
                 winner_text = "PLAYER 2 WINS!"
-            if player2.hp <= 0:
+            if p2_hp <= 0:
                 winner_text = "PLAYER 1 WINS!"
 
             if winner_text != "":
@@ -397,19 +372,13 @@ def game():
                 break
 
         keys_pressed = pygame.key.get_pressed()
-        if keys_pressed[pygame.K_a]:
-            if PLAYER_TURN == 1:
-                player1.move_left()
-            if PLAYER_TURN == 2:
-                player2.move_left()
-        if keys_pressed[pygame.K_d]:
-            if PLAYER_TURN == 1:
-                player1.move_right()
-            if PLAYER_TURN == 2:
-                player2.move_right()
+        if PLAYER_TURN == 1:
+            player1_move(keys_pressed,player1,bullet1)
+        if PLAYER_TURN == 2:
+            player2_move(keys_pressed,player2,bullet2)
 
-        # handle_bullets(player1.bullets,player2.bullets,player1.rect,player2.rect,bullet2)
-        draw_window(player1,player2,line1,line2,bullet1,bullet2,player1.hp,player2.hp,PLAYER_TURN)
+        handle_bullets(p1_bullets,p2_bullets,player1,player2,bullet2)
+        draw_window(player1,player2,p1_bullets,p2_bullets,line1,line2,bullet1,bullet2,p1_hp,p2_hp,PLAYER_TURN)
         
 
 
