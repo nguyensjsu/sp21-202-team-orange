@@ -9,25 +9,18 @@ import os
 
 pygame.font.init()
 if not audio_compat: pygame.mixer.init()
-MAX_BULLETS = 10
+# MAX_BULLETS = 10
+# General constants
 WHITE = (255,255,255)
 BLACK = (0,0,0)
 RED = (255,0,0)
 FPS=60
-WIDTH,HEIGHT = 900,500
+WIDTH,HEIGHT = 900, 500
 
 WIN = pygame.display.set_mode((WIDTH,HEIGHT))
 #MENUSCREEN = pygame.display.set_mode((WIDTH,HEIGHT))
-#global player constants
-PLAYER_WIDTH, PLAYER_HEIGHT = 55,40
-#player1 constants
-PLAYER1_IMAGE = pygame.image.load(os.path.join("images","spaceship_red.png"))
-PLAYER1 = pygame.transform.scale(PLAYER1_IMAGE,(PLAYER_WIDTH,PLAYER_HEIGHT))
-#player2 constants
-PLAYER2_IMAGE = pygame.image.load(os.path.join("images","spaceship_yellow.png"))
-PLAYER2 = pygame.transform.scale(PLAYER2_IMAGE,(PLAYER_WIDTH,PLAYER_HEIGHT))
 #object speeds
-BULLET_SPEED = 10
+# BULLET_SPEED = 10
 SPEED = 5
 #players getting hit event
 PLAYER1_HIT = pygame.USEREVENT + 1
@@ -88,14 +81,16 @@ class Player:
         self.bullets = []
         self.speed = 5
         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
-        # self.bullet = Bullet(self.x + 10, self.y + self.height // 2 + 2, 5, RED)
+        self.bullet = Bullet(self.x + self.width // 2, self.y + self.height // 2, 5, RED)
 
     def move_left(self):
         if self.x - SPEED > 0:
             self.x -= self.speed
+            self.bullet.x -= self.speed
     def move_right(self):
         if self.x + SPEED + self.width < WIDTH :
             self.x += self.speed
+            self.bullet.x += self.speed
 
 
 # def player1_move(keys_pressed,player1,bullet):
@@ -164,12 +159,12 @@ def draw_winner(text):
     pygame.time.delay(2000)
 
 
-def draw_window(p1,p2,line,line2,bullet1,bullet2,p1_hp,p2_hp,turn):
+def draw_window(p1, p2, line, line2, turn):
     #draw background
     WIN.blit(GAME_IMAGE,(0,0))
     #draw player health bars
-    p1_health_text = HEALTH_FONT.render("P1 Health: "+ str(p1_hp),1,WHITE)
-    p2_health_text = HEALTH_FONT.render("P2 Health: "+ str(p2_hp),1,WHITE)
+    p1_health_text = HEALTH_FONT.render("P1 Health: "+ str(p1.hp),1,WHITE)
+    p2_health_text = HEALTH_FONT.render("P2 Health: "+ str(p2.hp),1,WHITE)
     WIN.blit(p1_health_text,(WIDTH - p1_health_text.get_width()-10,10))
     WIN.blit(p2_health_text,((10,10)))
 
@@ -181,11 +176,11 @@ def draw_window(p1,p2,line,line2,bullet1,bullet2,p1_hp,p2_hp,turn):
         p2_turn = HEALTH_FONT.render("PLAYER 2's Turn",1,WHITE)
         WIN.blit(p2_turn,((300,100)))
     #draw projectile
-    bullet1.draw(WIN)
-    bullet2.draw(WIN)
+    p1.bullet.draw(WIN)
+    p2.bullet.draw(WIN)
     #draw players
-    WIN.blit(PLAYER1,(p1.x,p1.y))                        
-    WIN.blit(PLAYER2,(p2.x,p2.y))  
+    WIN.blit(p1.image,(p1.x,p1.y))                        
+    WIN.blit(p2.image,(p2.x,p2.y))  
 
     #pygame.draw.line(WIN,WHITE,line[0],line[1])
     #pygame.draw.line(WIN,WHITE,line2[0],line2[1])
@@ -259,8 +254,8 @@ def game():
     # player2 = pygame.Rect(100,300,PLAYER_WIDTH,PLAYER_HEIGHT)
     player1 = Player(700, 300, pygame.image.load(os.path.join("images","spaceship_red.png")))
     player2 = Player(100, 300, pygame.image.load(os.path.join("images","spaceship_yellow.png")))
-    bullet1 = Bullet(player1.x+10 , player1.y+player1.height//2 +2,5, RED)
-    bullet2 = Bullet(player2.x+player2.width-8, player2.y+player2.height//2 -2,5, RED)
+    # bullet1 = Bullet(player1.x+10 , player1.y+player1.height//2 +2,5, RED)
+    # bullet2 = Bullet(player2.x+player2.width-8, player2.y+player2.height//2 -2,5, RED)
     
     if not audio_compat:
         MAIN_BG_SOUND.stop()
@@ -301,30 +296,29 @@ def game():
         
         if PLAYER_TURN == 1:
             if shoot:
-                if bullet1.y <500 - bullet2.radius:
+                if player1.bullet.y <500 - player2.bullet.radius:
                     time += 0.05
-                    poss = bullet1.projectilePath(x,y,power,angle,time)
-                    bullet1.x = poss[0]
-                    bullet1.y = poss[1]
+                    poss = player1.bullet.projectilePath(x,y,power,angle,time)
+                    player1.bullet.x = poss[0]
+                    player1.bullet.y = poss[1]
                 else:
                     shoot=False
                     PLAYER_TURN = 2
-                    bullet1.x = player1.x + 10
-                    bullet1.y = player1.y + player1.height // 2 - 2
+                    player1.bullet.x = player1.x + 10
+                    player1.bullet.y = player1.y + player1.height // 2 - 2
         if PLAYER_TURN == 2:
             if shoot:
-                if bullet2.y < 500 - bullet2.radius:
+                if player2.bullet.y < 500 - player2.bullet.radius:
                     time += 0.05
-                    poss = bullet2.projectilePath(x, y, power, angle, time)
-                    bullet2.x = poss[0]
-                    bullet2.y = poss[1]
+                    poss = player2.bullet.projectilePath(x, y, power, angle, time)
+                    player2.bullet.x = poss[0]
+                    player2.bullet.y = poss[1]
                     
                 else:
                     shoot=False
                     PLAYER_TURN = 1
-                    
-                    bullet2.x = player2.x + player2.width - 8
-                    bullet2.y = player2.y + player2.height // 2 - 2
+                    player2.bullet.x = player2.x + player2.width - 8
+                    player2.bullet.y = player2.y + player2.height // 2 - 2
                 
         #position of the mouse
         pos = pygame.mouse.get_pos()
@@ -350,17 +344,17 @@ def game():
                     if not audio_compat: BULLET_FIRE_SOUND.play()
                     shoot = True
                     if PLAYER_TURN == 1:
-                        x = bullet1.x
-                        y = bullet1.y
+                        x = player1.bullet.x
+                        y = player1.bullet.y
                         time = 0
                         power = math.sqrt((line1[1][1] - line1[0][1]) ** 2 + (line1[1][0] - line1[0][0]) ** 2) / 8
-                        angle = findAngle(pos, player1, bullet1)
+                        angle = findAngle(pos, player1, player1.bullet)
                     if PLAYER_TURN == 2:
-                        x = bullet2.x
-                        y = bullet2.y
+                        x = player2.bullet.x
+                        y = player2.bullet.y
                         time = 0
                         power = math.sqrt((line2[1][1] - line2[0][1]) ** 2 + (line2[1][0] - line2[0][0]) ** 2) / 8
-                        angle = findAngle(pos, player2, bullet2)
+                        angle = findAngle(pos, player2, player2.bullet)
                     
                     #x = bullet2.x
                     #y = bullet2.y
@@ -403,7 +397,8 @@ def game():
                 player2.move_right()
 
         # handle_bullets(player1.bullets,player2.bullets,player1.rect,player2.rect,bullet2)
-        draw_window(player1,player2,line1,line2,bullet1,bullet2,player1.hp,player2.hp,PLAYER_TURN)
+        draw_window(player1, player2, line1, line2, PLAYER_TURN)
+
         
     pygame.quit()
 
