@@ -228,15 +228,9 @@ def main():
         credits_button = pygame.Rect(50, 300, 200, 50)
 
         
-        if game_start_button.collidepoint((mx, my)):
-            if click:
-                game()
-        if controls_button.collidepoint((mx, my)):
-            if click:
-                controls() 
-        if credits_button.collidepoint((mx, my)):
-            if click:
-                credit() 
+        if game_start_button.collidepoint((mx, my)) and click: game()
+        if controls_button.collidepoint((mx, my)) and click: controls() 
+        if credits_button.collidepoint((mx, my)) and click: credit() 
         pygame.draw.rect(WIN, (255, 0, 0), game_start_button)
         pygame.draw.rect(WIN, (255, 0, 0), controls_button)
         pygame.draw.rect(WIN, (255, 0, 0), credits_button)
@@ -264,7 +258,7 @@ def game():
     # player1 = pygame.Rect(700,300,PLAYER_WIDTH,PLAYER_HEIGHT)
     # player2 = pygame.Rect(100,300,PLAYER_WIDTH,PLAYER_HEIGHT)
     player1 = Player(700, 300, pygame.image.load(os.path.join("images","spaceship_red.png")))
-    player2 = Player(100, 3000, pygame.image.load(os.path.join("images","spaceship_yellow.png")))
+    player2 = Player(100, 300, pygame.image.load(os.path.join("images","spaceship_yellow.png")))
     bullet1 = Bullet(player1.x+10 , player1.y+player1.height//2 +2,5, RED)
     bullet2 = Bullet(player2.x+player2.width-8, player2.y+player2.height//2 -2,5, RED)
     
@@ -411,8 +405,6 @@ def game():
         # handle_bullets(player1.bullets,player2.bullets,player1.rect,player2.rect,bullet2)
         draw_window(player1,player2,line1,line2,bullet1,bullet2,player1.hp,player2.hp,PLAYER_TURN)
         
-
-
     pygame.quit()
 
 def controls():
@@ -444,7 +436,7 @@ def credit():
         draw_text('Ryan Choy, 014499316', HEALTH_FONT, (255, 255, 255), WIN, 50, 100)
         draw_text('Janaarthana Harri, 015246205', HEALTH_FONT, (255, 255, 255), WIN, 50, 200)
         draw_text('Premchand, ID number', HEALTH_FONT, (255, 255, 255), WIN, 50, 300)
-        draw_text('William, ID number', HEALTH_FONT, (255, 255, 255), WIN, 50, 400)
+        draw_text('William Su, 013697658', HEALTH_FONT, (255, 255, 255), WIN, 50, 400)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
