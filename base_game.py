@@ -80,7 +80,7 @@ class Player:
         self.width = 55
         self.height = 40
         self.image = pygame.transform.scale(image, (self.width, self.height))
-        self.bullets = []
+        self.alpha = 255
         self.speed = 5
         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
         self.bullet = Bullet(self.x + self.width // 2,
@@ -190,6 +190,8 @@ def draw_window(p1, p2, line, line2, turn):
     p1.bullet.draw(WIN)
     p2.bullet.draw(WIN)
     # draw players
+    p1.image.set_alpha(p1.alpha)
+    p2.image.set_alpha(p2.alpha)
     WIN.blit(p1.image, (p1.x, p1.y))
     WIN.blit(p2.image, (p2.x, p2.y))
 
@@ -286,7 +288,8 @@ def game():
     power = 0
     angle = 0
     shoot = False
-    click = False
+    hit_registered = False
+
 
     # Setup snow
     if (use_snow):
@@ -312,6 +315,7 @@ def game():
                     x, y, power, angle, time)  # recalculate bullet location
             else:  # bullet has left frame boundary
                 shoot = False
+                hit_registered = False
                 player_1_turn = not player_1_turn
                 active_player.reset_bullet()  # retrive bullet
                 # switch active and dormant roles
@@ -335,7 +339,8 @@ def game():
             # keypress event
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
-                    GAME_BG_SOUND.stop()
+                    if not audio_compat:
+                        GAME_BG_SOUND.stop()
                     main()
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
@@ -367,11 +372,10 @@ def game():
                         angle = findAngle(pos, player2, player2.bullet)
 
             # not sure how these hit events are meant to happen; collision doesn't seem to work yet
-            elif event.type == PLAYER1_HIT:
-                player1.hp -= 10
-
-            elif event.type == PLAYER2_HIT:
-                player2.hp -= 10
+            elif event.type == PLAYER1_HIT or event.type == PLAYER2_HIT:
+                if not hit_registered:
+                    dormant_player.hp -= 10
+                    hit_registered = True
 
             if active_player.hp <= 0:  # if active player's HP is 0, that means the other player killed them last turn
                 # simple formula to generate winning text instead of layers of conditionals
