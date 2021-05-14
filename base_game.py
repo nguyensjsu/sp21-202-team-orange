@@ -82,19 +82,22 @@ class Player:
         self.image = pygame.transform.scale(image, (self.width, self.height))
         self.alpha = 255
         self.speed = 5
+        self.fuel = 100
         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
         self.bullet = Bullet(self.x + self.width // 2,
                              self.y + self.height // 2, 5, RED)
 
     def move_left(self):
-        if self.x - self.speed > 0:
+        if self.x - self.speed > 0 and self.fuel > 0:
             self.x -= self.speed
+            self.fuel -= self.speed
             self.bullet.x -= self.speed
             self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
 
     def move_right(self):
-        if self.x + self.speed + self.width < WIDTH:
+        if self.x + self.speed + self.width < WIDTH and self.fuel > 0:
             self.x += self.speed
+            self.fuel -= self.speed
             self.bullet.x += self.speed
             self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
 
@@ -119,24 +122,6 @@ def handle_bullets(active_player: Player, dormant_player: Player, isPlayer1: boo
             else:
                 pygame.event.post(pygame.event.Event(PLAYER1_HIT))
             active_player.reset_bullet()
-#     for bullet in p2_b:
-#         bullet.x += BULLET_SPEED
-#         if p1.colliderect(bullet):
-#             pygame.event.post(pygame.event.Event(PLAYER1_HIT))
-#             p2_b.remove(bullet)
-#         elif bullet.x > WIDTH:
-#             p2_b.remove(bullet)
-
-#     for bullet in p1_b:
-#         bullet.x -= BULLET_SPEED
-#         if p2.colliderect(bullet):
-#             pygame.event.post(pygame.event.Event(PLAYER2_HIT))
-#             p1_b.remove(bullet)
-#         elif bullet.x < 0:
-#             p1_b.remove(bullet)
-#     if p1.colliderect(bullet):
-#     pygame.event.post(pygame.event.Event(PLAYER2_HIT))
-#     pass
 
 
 def findAngle(pos, p1, p2):
@@ -318,6 +303,7 @@ def game():
                 hit_registered = False
                 player_1_turn = not player_1_turn
                 active_player.reset_bullet()  # retrive bullet
+                active_player.fuel = 100
                 # switch active and dormant roles
                 temp = active_player
                 active_player = dormant_player
