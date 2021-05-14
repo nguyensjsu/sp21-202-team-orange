@@ -26,6 +26,7 @@ if not audio_compat:
         os.path.join("images", "Assets_Gun+Silencer.mp3"))
     MAIN_BG_SOUND = pygame.mixer.Sound(os.path.join("images", "Main_BG.ogg"))
     GAME_BG_SOUND = pygame.mixer.Sound(os.path.join("images", "Game_BG.ogg"))
+
 # Backgrounds
 GAME_IMAGE = pygame.transform.scale(pygame.image.load(
     os.path.join("images", "BG.png")), (WIDTH, HEIGHT))
@@ -35,15 +36,13 @@ MAIN_IMAGE = pygame.transform.scale(pygame.image.load(
 #explosion animation 
 #load the images into the list
 explosion_anim = {}
-explosion_anim['sm'] = []
+explosion_anim['lg'] = []
 for i in range(9):
     file = 'regularExplosion0{}.png'.format(i)
     img = pygame.image.load(os.path.join("images", file))
     img.set_colorkey(BLACK)
-    img_sm = pygame.transform.scale(img, (32, 32))
-    explosion_anim['sm'].append(img_sm)
-
- 
+    img_lg = pygame.transform.scale(img, (72, 72))
+    explosion_anim['lg'].append(img_lg)
 
 WIN = pygame.display.set_mode((WIDTH, HEIGHT))
 #MENUSCREEN = pygame.display.set_mode((WIDTH,HEIGHT))
@@ -54,10 +53,13 @@ PLAYER2_HIT = pygame.USEREVENT + 2
 pygame.display.set_caption("Worms")
 use_snow = True
 snow_list = []
+# control fps
+clock = pygame.time.Clock()
 
 
-class Bullet(object):
+class Bullet(pygame.sprite.Sprite):
     def __init__(self, x, y, radius, color):
+        pygame.sprite.Sprite.__init__(self)
         self.x = x
         self.y = y
         self.radius = radius
@@ -122,6 +124,7 @@ class Player(pygame.sprite.Sprite):
         self.alpha = 255
         self.speed = 5
         self.fuel = 100
+        self.shield = 100
         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
         self.bullet = Bullet(self.x + self.width // 2,
                              self.y + self.height // 2, 5, RED)
@@ -191,7 +194,7 @@ def draw_winner(text):
     WIN.blit(draw_text, (WIDTH/2-draw_text.get_width() /
              2, HEIGHT/2 - draw_text.get_height()/2))
     pygame.display.update()
-    pygame.time.delay(2000)
+    pygame.time.delay(1500)
 
 
 def draw_window(p1, p2, line, line2, turn):
@@ -246,6 +249,21 @@ def draw_snow():
 
     pygame.display.update()
 
+def show_go_screen():
+    WIN.blit(MAIN_IMAGE, (0,0))
+    draw_text('GAME NAME', HEALTH_FONT, WHITE, WIN, 320, 100)
+    draw_text("A and D to move, Mouse to fire",HEALTH_FONT,WHITE, WIN, 200, 270)
+    draw_text("Press a key to begin",HEALTH_FONT, WHITE, WIN, 270, 350)
+    pygame.display.flip()
+    waiting = True
+    while waiting:
+        clock.tick(FPS)
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+            if event.type == pygame.KEYUP:
+                waiting = False
+
 
 def main():
     click = False
@@ -295,26 +313,9 @@ def main():
 
 def game():
 
-    player1 = Player(700, 300, pygame.image.load(
-        os.path.join("images", "spaceship_red.png")))
-
-    player2 = Player(100, 300, pygame.image.load(
-        os.path.join("images", "spaceship_yellow.png")))
-
-
     if not audio_compat:
         MAIN_BG_SOUND.stop()
         GAME_BG_SOUND.play()
-    player_1_turn = True
-    active_player = player1
-    dormant_player = player2
-    x = 0
-    y = 0
-    time = 0
-    power = 0
-    angle = 0
-    shoot = False
-    hit_registered = False
 
 
     # Setup snow
@@ -324,13 +325,33 @@ def game():
             y = random.randrange(0, HEIGHT)
             snow_list.append([x, y])
 
-    # control fps
-    clock = pygame.time.Clock()
+    
+    game_over = True
     run = True
-
-    all_sprites = pygame.sprite.Group()
-
     while run:
+        
+        #Resets the gameloop 
+        if game_over:
+           show_go_screen()
+           game_over = False
+           player1 = Player(700, 300, pygame.image.load(
+                os.path.join("images", "spaceship_red.png")))
+           player2 = Player(100, 300, pygame.image.load(
+                os.path.join("images", "spaceship_yellow.png")))
+           all_sprites = pygame.sprite.Group()
+           player_1_turn = True
+           active_player = player1
+           dormant_player = player2
+           active_player.hp = 100
+           dormant_player.hp = 100
+           x = 0
+           y = 0
+           time = 0
+           power = 0
+           angle = 0
+           shoot = False
+           hit_registered = False
+
 
         # Update the snow flakes
         if (use_snow):
@@ -352,6 +373,8 @@ def game():
                 temp = active_player
                 active_player = dormant_player
                 dormant_player = temp
+        
+        all_sprites.update()
 
         # position of the mouse
         pos = pygame.mouse.get_pos()
@@ -362,9 +385,7 @@ def game():
 
         clock.tick(FPS)
         click = False
-
-        all_sprites.update()
-
+        
         for event in pygame.event.get():
 
             # press close window event
@@ -408,17 +429,19 @@ def game():
             # not sure how these hit events are meant to happen; collision doesn't seem to work yet
             elif event.type == PLAYER1_HIT or event.type == PLAYER2_HIT:
                 if not hit_registered:
-                    dormant_player.hp -= 10
+                    dormant_player.hp -= 50
                     BULLET_HIT_SOUND.play()
-                    expl = Explosion( dormant_player.rect.center, 'sm')
+                    expl = Explosion( dormant_player.rect.center, 'lg')
                     all_sprites.add(expl)
                     hit_registered = True
 
-                
-            if active_player.hp <= 0:  # if active player's HP is 0, that means the other player killed them last turn
-            # simple formula to generate winning text instead of layers of conditionals
-                draw_winner("PLAYER " + str(int(player_1_turn) + 1) + " WINS!")
-                break
+            #pygame.sprite.spritecollide(dormant_player, active_player.bullet, True)
+    
+            if active_player.hp <= 0:  # if active player's HP is 0, that means the other player killed them last turn 
+               #simple formula to generate winning text instead of layers of conditionals
+               draw_winner("PLAYER " + str(int(player_1_turn) + 1) + " WINS!")
+               game_over=True
+
 
         pressed = pygame.key.get_pressed()
         if pressed[pygame.K_a]:
