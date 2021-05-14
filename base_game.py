@@ -41,6 +41,8 @@ PLAYER2_HIT = pygame.USEREVENT + 2
 pygame.display.set_caption("Worms")
 use_snow = True
 snow_list = []
+#amount of snow - optimal between 50-80
+snow_quantity = 60
 
 
 class Bullet(object):
@@ -278,7 +280,7 @@ def game():
 
     # Setup snow
     if (use_snow):
-        for i in range(60):
+        for i in range(snow_quantity):
             x = random.randrange(0, WIDTH)
             y = random.randrange(0, HEIGHT)
             snow_list.append([x, y])
