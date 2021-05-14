@@ -4,7 +4,7 @@ import math
 import pygame
 import os
 # Set False if audio works for you; pygame has audio problems on my desktop. -William
-audio_compat = True
+audio_compat = False
 
 
 pygame.font.init()
@@ -31,6 +31,19 @@ GAME_IMAGE = pygame.transform.scale(pygame.image.load(
     os.path.join("images", "BG.png")), (WIDTH, HEIGHT))
 MAIN_IMAGE = pygame.transform.scale(pygame.image.load(
     os.path.join("images", "background.jpg")), (WIDTH, HEIGHT))
+
+#explosion animation 
+#load the images into the list
+explosion_anim = {}
+explosion_anim['sm'] = []
+for i in range(9):
+    file = 'regularExplosion0{}.png'.format(i)
+    img = pygame.image.load(os.path.join("images", file))
+    img.set_colorkey(BLACK)
+    img_sm = pygame.transform.scale(img, (32, 32))
+    explosion_anim['sm'].append(img_sm)
+
+ 
 
 WIN = pygame.display.set_mode((WIDTH, HEIGHT))
 #MENUSCREEN = pygame.display.set_mode((WIDTH,HEIGHT))
@@ -72,8 +85,34 @@ class Bullet(object):
         return newX, newY
 
 
-class Player:
+class Explosion(pygame.sprite.Sprite):
+    def __init__(self, center, size):
+        pygame.sprite.Sprite.__init__(self)
+        self.size = size
+        self.image = explosion_anim[self.size][0]
+        self.rect = self.image.get_rect()
+        self.rect.center = center
+        self.frame = 0
+        self.last_update = pygame.time.get_ticks()
+        self.frame_rate = 50
+
+    def update(self):
+        now = pygame.time.get_ticks()
+        if now - self.last_update > self.frame_rate:
+            self.last_update = now
+            self.frame += 1
+            if self.frame == len(explosion_anim[self.size]):
+                self.kill()
+            else:
+                center = self.rect.center
+                self.image = explosion_anim[self.size][self.frame]
+                self.rect = self.image.get_rect()
+                self.rect.center = center
+
+     
+class Player(pygame.sprite.Sprite):
     def __init__(self, x, y, image):
+        pygame.sprite.Sprite.__init__(self)
         self.x = x
         self.y = y
         self.hp = 100
@@ -255,11 +294,13 @@ def main():
 
 
 def game():
+
     player1 = Player(700, 300, pygame.image.load(
         os.path.join("images", "spaceship_red.png")))
 
     player2 = Player(100, 300, pygame.image.load(
         os.path.join("images", "spaceship_yellow.png")))
+
 
     if not audio_compat:
         MAIN_BG_SOUND.stop()
@@ -286,6 +327,9 @@ def game():
     # control fps
     clock = pygame.time.Clock()
     run = True
+
+    all_sprites = pygame.sprite.Group()
+
     while run:
 
         # Update the snow flakes
@@ -318,7 +362,11 @@ def game():
 
         clock.tick(FPS)
         click = False
+
+        all_sprites.update()
+
         for event in pygame.event.get():
+
             # press close window event
             if event.type == pygame.QUIT:
                 run = False
@@ -361,10 +409,14 @@ def game():
             elif event.type == PLAYER1_HIT or event.type == PLAYER2_HIT:
                 if not hit_registered:
                     dormant_player.hp -= 10
+                    BULLET_HIT_SOUND.play()
+                    expl = Explosion( dormant_player.rect.center, 'sm')
+                    all_sprites.add(expl)
                     hit_registered = True
 
+                
             if active_player.hp <= 0:  # if active player's HP is 0, that means the other player killed them last turn
-                # simple formula to generate winning text instead of layers of conditionals
+            # simple formula to generate winning text instead of layers of conditionals
                 draw_winner("PLAYER " + str(int(player_1_turn) + 1) + " WINS!")
                 break
 
@@ -376,8 +428,11 @@ def game():
 
         handle_bullets(active_player, dormant_player, player_1_turn)
         draw_window(player1, player2, line1, line2, int(player_1_turn) + 1)
+       
         pygame.draw.rect(WIN, (255, 0, 0), player1.rect, 2)
         pygame.draw.rect(WIN, (255, 0, 0), player2.rect, 2)
+
+        all_sprites.draw(WIN)
 
     pygame.quit()
 
