@@ -199,15 +199,15 @@ def draw_winner(text):
     WIN.blit(draw_text, (WIDTH/2-draw_text.get_width() /
              2, HEIGHT/2 - draw_text.get_height()/2))
     pygame.display.update()
-    pygame.time.delay(1500)
+    #pygame.time.delay(1500)
 
 
 def draw_window(p1, p2, turn):
     # draw background
     WIN.blit(GAME_IMAGE, (0, 0))
     # draw player health bars
-    p1_health_text = HEALTH_FONT.render("P1 Health: " + str(p1.hp), 1, WHITE)
-    p2_health_text = HEALTH_FONT.render("P2 Health: " + str(p2.hp), 1, WHITE)
+    p1_health_text = HEALTH_FONT.render("P2 Health: " + str(p1.hp), 1, WHITE)
+    p2_health_text = HEALTH_FONT.render("P1 Health: " + str(p2.hp), 1, WHITE)
     WIN.blit(p1_health_text, (WIDTH - p1_health_text.get_width()-10, 10))
     WIN.blit(p2_health_text, ((10, 10)))
 
@@ -437,8 +437,13 @@ def game():
     
             if active_player.hp <= 0:  # if active player's HP is 0, that means the other player killed them last turn 
                #simple formula to generate winning text instead of layers of conditionals
-               draw_winner("PLAYER " + str(int(player_1_turn) + 1) + " WINS!")
-               game_over=True
+                if active_player == player1:
+                    draw_winner("PLAYER 1 WINS!")
+                   
+                if active_player == player2:
+                    draw_winner("PLAYER 2 WINS!")
+                pygame.time.delay(3000)
+                game_over=True
 
 
         pressed = pygame.key.get_pressed()
