@@ -266,6 +266,9 @@ def show_go_screen():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    main()
             if event.type == pygame.KEYUP:
                 waiting = False
 
@@ -275,7 +278,7 @@ def main():
     while True:
 
         WIN.blit(MAIN_IMAGE, (0, 0))
-        draw_text('main menu', HEALTH_FONT, WHITE, WIN, 20, 20)
+        draw_text('Main Menu', HEALTH_FONT, WHITE, WIN, 20, 20)
 
         if not audio_compat:
             MAIN_BG_SOUND.play()
@@ -457,15 +460,12 @@ def game():
 
 def controls():
     running = True
+    
     while running:
-        WIN.fill((0, 0, 0))
-        draw_text('Controls', HEALTH_FONT, WHITE, WIN, 20, 20)
-        draw_text('Use Mouse to Shoot', HEALTH_FONT, WHITE, WIN, 20, 100)
-        draw_text('Player 1 uses a and d to move left and right',
-                  HEALTH_FONT, WHITE, WIN, 20, 200)
-        draw_text('Player 2 uses left arrow key and right arrow key ',
-                  HEALTH_FONT, WHITE, WIN, 20, 300)
-        draw_text('to move left and right', HEALTH_FONT, WHITE, WIN, 20, 400)
+        WIN.blit(MAIN_IMAGE, (0,0))
+        draw_text('A and D to move', HEALTH_FONT, WHITE, WIN, 320, 100)
+        draw_text("Mouse to fire",HEALTH_FONT,WHITE, WIN, 320, 100)
+        pygame.display.flip()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -480,7 +480,7 @@ def controls():
 def credit():
     running = True
     while running:
-        WIN.fill((0, 0, 0))
+        WIN.blit(MAIN_IMAGE, (0,0))
         draw_text('Credits', HEALTH_FONT, WHITE, WIN, 20, 20)
         draw_text('Ryan Choy, 014499316', HEALTH_FONT, WHITE, WIN, 50, 100)
         draw_text('Janaarthana Harri, 015246205',
