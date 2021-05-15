@@ -8,7 +8,7 @@ from Bullet import *
 from Player import *
 from Explosion import *
 # Set False if audio works for you; pygame has audio problems on my desktop. -William
-audio_compat = False
+audio_compat = True
 img_dir = path.join(path.dirname(__file__), 'img')
 snd_dir = path.join(path.dirname(__file__), 'snd')
 
