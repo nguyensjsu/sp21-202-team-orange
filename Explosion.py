@@ -1,13 +1,14 @@
 import pygame
-import os
+from os import path
 BLACK = (0,0,0)
 #explosion animation 
 #load the images into the list
+img_dir = path.join(path.dirname(__file__), 'img')
 explosion_anim = {}
 explosion_anim['lg'] = []
 for i in range(9):
     file = 'regularExplosion0{}.png'.format(i)
-    img = pygame.image.load(os.path.join("images", file))
+    img = pygame.image.load(path.join(img_dir, file))
     img.set_colorkey(BLACK)
     img_lg = pygame.transform.scale(img, (72, 72))
     explosion_anim['lg'].append(img_lg)
