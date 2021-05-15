@@ -2,7 +2,7 @@
 # Team members
 1. Ryan Choy 014499316
 2. William Su 013697658
-3. Janaarthana
+3. Janaarthana Harri 015246205
 4. Premchand
 
 # Contributions
