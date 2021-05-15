@@ -46,6 +46,12 @@ class Player(pygame.sprite.Sprite):
         return self.x, self.y
     
     def get_image(self):
+        # pivot = (self.x + self.width // 2, self.y + self.height // 2)
+        # rotated_image = pg.transform.rotozoom(self.image, -self.angle, 1)  # Rotate the image.
+        # rotated_offset = offset.rotate(angle)  # Rotate the offset vector.
+        # # Add the offset vector to the center/pivot point to shift the rect.
+        # rect = rotated_image.get_rect(center=pivot+rotated_offset)
+        # return rotated_image, rect  # Return the rotated image and shifted rect
         rotated_image = pygame.transform.rotate(self.image, self.angle)
         return rotated_image
     

@@ -75,14 +75,20 @@ def findAngle(pos, obj):
     except:
         angle = math.pi/2
 
-    if pos[1] < obj.y and pos[0] > obj.x:
+    if pos[0] < obj.x:
+        angle = math.pi - angle
+    elif pos[1] < obj.y:
         angle = abs(angle)
-    elif pos[1] < obj.y and pos[0] < obj.x:
-        angle = math.pi - angle
-    elif pos[1] > obj.y and pos[0] < obj.x:
-        angle = math.pi - angle
-    elif pos[1] > obj.y and pos[0] > obj.x:
-        angle = (math.pi*2) - angle
+    elif pos[1] > obj.y:
+        angle = 2 * math.pi - angle
+    # if pos[1] < obj.y and pos[0] > obj.x:
+    #     angle = abs(angle)
+    # elif pos[1] < obj.y and pos[0] < obj.x:
+    #     angle = math.pi - angle
+    # elif pos[1] > obj.y and pos[0] < obj.x:
+    #     angle = math.pi - angle
+    # elif pos[1] > obj.y and pos[0] > obj.x:
+    #     angle = (math.pi*2) - angle
     return angle
 
 
@@ -286,8 +292,10 @@ def game():
 
         # position of the mouse
         pos = pygame.mouse.get_pos()
-        active_player.angle = findAngle(pos, active_player) / 6.28 * 360
-        print(active_player.angle / 6.28 * 360)
+
+        #rotate active player sprite to match aim
+        active_player.angle = findAngle(pos, active_player) * 57.29 #this is just converting radian output to
+
         # invisible line determining the angle of the projectile
         line1 = [(active_player.x + 10, active_player.y + active_player.height // 2 - 2), pos]
         #line2 = [(player2.x + player2.width - 8,
