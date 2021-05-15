@@ -30,6 +30,9 @@ if not audio_compat:
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 RED = (255, 0, 0)
+GREEN = (0, 255, 0)
+ORANGE = (255, 100, 10)
+
 FPS = 60
 WIDTH, HEIGHT = 900, 500
 HEALTH_FONT = pygame.font.Font("KGHolocene.ttf", 20)
@@ -109,10 +112,10 @@ def draw_window(p1, p2, turn):
     # draw background
     WIN.blit(GAME_IMAGE, (0, 0))
     # draw player health bars
-    p1_health_text = HEALTH_FONT.render("P2 Health: " + str(p1.hp), 1, WHITE)
-    p2_health_text = HEALTH_FONT.render("P1 Health: " + str(p2.hp), 1, WHITE)
-    WIN.blit(p1_health_text, (WIDTH - p1_health_text.get_width()-10, 10))
-    WIN.blit(p2_health_text, ((10, 10)))
+    #p1_health_text = HEALTH_FONT.render("P2 Health: " + str(p1.hp), 1, WHITE)
+    #p2_health_text = HEALTH_FONT.render("P1 Health: " + str(p2.hp), 1, WHITE)
+    #WIN.blit(p1_health_text, (WIDTH - p1_health_text.get_width()-10, 10))
+    #WIN.blit(p2_health_text, ((10, 10)))
 
     if turn == 1:
         p1_turn = HEALTH_FONT.render("PLAYER 1's Turn", 1, WHITE)
@@ -174,6 +177,33 @@ def show_go_screen():
                     main()
             if event.type == pygame.KEYUP:
                 waiting = False
+
+def draw_shield_bar(surf, pct, pct2, p1, p2):
+    if pct & pct2 < 0:
+        pct = 0
+        pct2 = 0
+    BAR_LENGTH = 100
+    BAR_HEIGHT = 10
+    x, y = 5, 5
+    X, Y = (WIDTH - BAR_LENGTH), 5
+    fill = (pct / 100) * BAR_LENGTH
+    fill2 = (pct2 / 100) * BAR_LENGTH
+    outline_rect = pygame.Rect(X, Y, BAR_LENGTH, BAR_HEIGHT)
+    outline_rect2 = pygame.Rect(x, y, BAR_LENGTH, BAR_HEIGHT)
+    fill_rect = pygame.Rect(X, Y, fill, BAR_HEIGHT)
+    fill_rect2 = pygame.Rect(x, y, fill2, BAR_HEIGHT)
+    if pct >= 60:
+       pygame.draw.rect(surf, GREEN, fill_rect)
+       pygame.draw.rect(surf, WHITE, outline_rect, 2)
+    if pct2 >= 60:
+       pygame.draw.rect(surf, GREEN, fill_rect2)
+       pygame.draw.rect(surf, WHITE, outline_rect2, 2)
+    if pct < 60:
+       pygame.draw.rect(surf, ORANGE, fill_rect)
+       pygame.draw.rect(surf, WHITE, outline_rect, 2)
+    if pct2 < 60:
+       pygame.draw.rect(surf, ORANGE, fill_rect2)
+       pygame.draw.rect(surf, WHITE, outline_rect2, 2)
 
 
 def main():
@@ -340,7 +370,7 @@ def game():
             # not sure how these hit events are meant to happen; collision doesn't seem to work yet
             elif event.type == PLAYER1_HIT or event.type == PLAYER2_HIT:
                 if not hit_registered:
-                    dormant_player.hp -= 50
+                    dormant_player.hp -= 20
                     if not audio_compat:
                         random.choice(BULLET_HIT_SOUND).play()
                     expl = Explosion( dormant_player.rect.center, 'lg')
@@ -368,6 +398,8 @@ def game():
 
         handle_bullets(active_player, dormant_player, player_1_turn)
         draw_window(player1, player2, int(player_1_turn) + 1)
+        draw_shield_bar(WIN, player1.hp, player2.hp, player1, player2)
+
        
         pygame.draw.rect(WIN, (255, 0, 0), player1.rect, -1)
         pygame.draw.rect(WIN, (255, 0, 0), player2.rect, -1)
