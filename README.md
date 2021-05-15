@@ -18,6 +18,11 @@ The idea for this game project is a multiplayer shooting game where a player has
 ![]()
 
 # Key Features
+1. Speed and angle of projectile based on location of mouse
+2. Different character models
+3. Dynamic hp bar visual that changes based on incoming damage
+4. Dynamic pixel elements imitating snow fall
+5. Characters model change its direction based on the position of the mouse
 
 # Youtube Ad link
 
