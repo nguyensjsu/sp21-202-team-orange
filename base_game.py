@@ -369,8 +369,8 @@ def game():
         handle_bullets(active_player, dormant_player, player_1_turn)
         draw_window(player1, player2, int(player_1_turn) + 1)
        
-        pygame.draw.rect(WIN, (255, 0, 0), player1.rect, 2)
-        pygame.draw.rect(WIN, (255, 0, 0), player2.rect, 2)
+        pygame.draw.rect(WIN, (255, 0, 0), player1.rect, -1)
+        pygame.draw.rect(WIN, (255, 0, 0), player2.rect, -1)
 
         all_sprites.draw(WIN)
 
@@ -404,7 +404,7 @@ def credit():
         draw_text('Ryan Choy, 014499316', HEALTH_FONT, WHITE, WIN, 50, 100)
         draw_text('Janaarthana Harri, 015246205',
                   HEALTH_FONT, WHITE, WIN, 50, 200)
-        draw_text('Premchand, 015326428', HEALTH_FONT, WHITE, WIN, 50, 300)
+        draw_text('Premchand Jayachandran, 015326428', HEALTH_FONT, WHITE, WIN, 50, 300)
         draw_text('William Su, 013697658', HEALTH_FONT, WHITE, WIN, 50, 400)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
