@@ -40,11 +40,8 @@ GAME_IMAGE = pygame.transform.scale(pygame.image.load(
 MAIN_IMAGE = pygame.transform.scale(pygame.image.load(
     path.join(img_dir, "background.jpg")), (WIDTH, HEIGHT))
 
-
-
 WIN = pygame.display.set_mode((WIDTH, HEIGHT))
-#MENUSCREEN = pygame.display.set_mode((WIDTH,HEIGHT))
-# players getting hit event
+# create players getting hit event
 PLAYER1_HIT = pygame.USEREVENT + 1
 PLAYER2_HIT = pygame.USEREVENT + 2
 
@@ -57,7 +54,6 @@ clock = pygame.time.Clock()
 
 
 def handle_bullets(active_player: Player, dormant_player: Player, isPlayer1: bool):
-    # if (active_player.bullet.hit == False):
     if (active_player.bullet.y - active_player.bullet.radius < dormant_player.rect[1] + dormant_player.rect[3] and
             active_player.bullet.y + active_player.bullet.radius > dormant_player.rect[1]):
         if (active_player.bullet.x + active_player.bullet.radius > dormant_player.rect[0] and
@@ -68,28 +64,6 @@ def handle_bullets(active_player: Player, dormant_player: Player, isPlayer1: boo
                 pygame.event.post(pygame.event.Event(PLAYER1_HIT))
             active_player.reset_bullet()
 
-
-def findAngle(pos, obj):
-    try:
-        angle = math.atan((obj.y - pos[1])/(obj.x-pos[0]))
-    except:
-        angle = math.pi/2
-
-    if pos[0] < obj.x:
-        angle = math.pi - angle
-    elif pos[1] < obj.y:
-        angle = abs(angle)
-    elif pos[1] > obj.y:
-        angle = 2 * math.pi - angle
-    # if pos[1] < obj.y and pos[0] > obj.x:
-    #     angle = abs(angle)
-    # elif pos[1] < obj.y and pos[0] < obj.x:
-    #     angle = math.pi - angle
-    # elif pos[1] > obj.y and pos[0] < obj.x:
-    #     angle = math.pi - angle
-    # elif pos[1] > obj.y and pos[0] > obj.x:
-    #     angle = (math.pi*2) - angle
-    return angle
 
 
 def draw_winner(text):
@@ -123,14 +97,13 @@ def draw_window(p1, p2, turn):
     # draw players
     p1.image.set_alpha(p1.alpha)
     p2.image.set_alpha(p2.alpha)
-    WIN.blit(p1.get_image(), (p1.x, p1.y))
-    WIN.blit(p2.get_image(), (p2.x, p2.y))
-
-    # pygame.draw.line(WIN,WHITE,line[0],line[1])
-    # pygame.draw.line(WIN,WHITE,line2[0],line2[1])
+    p1img = p1.get_image(WIN)
+    p2img = p2.get_image(WIN)
+    #drawing is now handled by player objects
 
     # update each frame
     pygame.display.update()
+
 
 
 def draw_text(text, font, color, surface, x, y):
@@ -138,6 +111,7 @@ def draw_text(text, font, color, surface, x, y):
     textrect = textobj.get_rect()
     textrect.topleft = (x, y)
     surface.blit(textobj, textrect)
+
 
 
 def draw_snow():
@@ -152,6 +126,8 @@ def draw_snow():
             snow_list[i][1] = y
 
     pygame.display.update()
+
+
 
 def show_go_screen():
     WIN.blit(MAIN_IMAGE, (0,0))
@@ -170,6 +146,7 @@ def show_go_screen():
                     main()
             if event.type == pygame.KEYUP:
                 waiting = False
+
 
 
 def main():
@@ -218,6 +195,7 @@ def main():
         pygame.display.update()
 
 
+
 def game():
 
     if not audio_compat:
@@ -241,10 +219,8 @@ def game():
         if game_over:
            show_go_screen()
            game_over = False
-           player1 = Player(700, 300, pygame.image.load(
-                path.join(img_dir, "spaceship_red.png")))
-           player2 = Player(100, 300, pygame.image.load(
-                path.join(img_dir, "spaceship_yellow.png")))
+           player1 = Player(100, 285, image = pygame.image.load(path.join(img_dir, "arm.png")), subimg = pygame.image.load(path.join(img_dir, "body.png")))
+           player2 = Player(700, 285, image = pygame.image.load(path.join(img_dir, "arm.png")), subimg = pygame.image.load(path.join(img_dir, "body.png")), player2 = True)
            all_sprites = pygame.sprite.Group()
            player_1_turn = True
            active_player = player1
@@ -256,6 +232,7 @@ def game():
            camera = Camera(bul)
            follow = Follow(camera,bul)
            border = Border(camera,bul)
+
 
            camera.setmethod(follow)
 
@@ -273,10 +250,11 @@ def game():
             draw_snow()
         if shoot:
             camera.scroll()
-            if active_player.bullet.y < 362 and not hit_registered:  # bullet is still within frame
-                active_player.bullet.time += 0.25
+            if active_player.bullet.y < 362 and not hit_registered:  # bullet is still within frame and hasn't hit anything yet
+                active_player.bullet.advance_physics()
+                #bullets now shoot from proper locations
                 active_player.bullet.x, active_player.bullet.y = active_player.bullet.projectilePath(
-                    x, y)
+                    active_player.x + active_player.width // 2, active_player.y + active_player.height // 2)
             else:  # bullet has left frame boundary
                 shoot = False
                 hit_registered = False
@@ -294,12 +272,11 @@ def game():
         pos = pygame.mouse.get_pos()
 
         #rotate active player sprite to match aim
-        active_player.angle = findAngle(pos, active_player) * 57.29 #this is just converting radian output to
+        # active_player.angle = findAngle(pos, active_player) * 57.29 #this is just converting radian output to
+        active_player.calc_angle(pos)
 
         # invisible line determining the angle of the projectile
         line1 = [(active_player.x + 10, active_player.y + active_player.height // 2 - 2), pos]
-        #line2 = [(player2.x + player2.width - 8,
-                  #player2.y + player2.height // 2 - 2), pos]
 
         clock.tick(FPS)
         click = False
@@ -327,16 +304,13 @@ def game():
                         BULLET_FIRE_SOUND.play()
                     shoot = True
 
-                    x, y = active_player.new_bullet()
-                    active_player.bullet.time = 0
-                    active_player.bullet.power = math.sqrt(
-                            (line1[1][1] - line1[0][1]) ** 2 + (line1[1][0] - line1[0][0]) ** 2) / 8
-                    active_player.bullet.angle = findAngle(pos, active_player.bullet)
+                    x, y = active_player.new_bullet() #I'm assuming the return is for the camera follow?
+                    active_player.bullet.fire(line1, pos)
 
             # not sure how these hit events are meant to happen; collision doesn't seem to work yet
             elif event.type == PLAYER1_HIT or event.type == PLAYER2_HIT:
                 if not hit_registered:
-                    dormant_player.hp -= 50
+                    dormant_player.hp -= 34
                     if not audio_compat:
                         random.choice(BULLET_HIT_SOUND).play()
                     expl = Explosion( dormant_player.rect.center, 'lg')
@@ -348,11 +322,11 @@ def game():
             if active_player.hp <= 0:  # if active player's HP is 0, that means the other player killed them last turn 
                #simple formula to generate winning text instead of layers of conditionals
                 if active_player == player1:
-                    draw_winner("PLAYER 1 WINS!")
+                    draw_winner("PLAYER 2 WINS!")
                    
                 if active_player == player2:
-                    draw_winner("PLAYER 2 WINS!")
-                pygame.time.delay(3000)
+                    draw_winner("PLAYER 1 WINS!")
+                pygame.time.delay(2000)
                 game_over=True
 
 
@@ -371,6 +345,7 @@ def game():
         all_sprites.draw(WIN)
 
     pygame.quit()
+
 
 
 def controls():
@@ -392,6 +367,7 @@ def controls():
         pygame.display.update()
 
 
+
 def credit():
     running = True
     while running:
@@ -411,6 +387,7 @@ def credit():
                     running = False
 
         pygame.display.update()
+
 
 
 if __name__ == "__main__":
