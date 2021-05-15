@@ -178,7 +178,7 @@ def show_go_screen():
             if event.type == pygame.KEYUP:
                 waiting = False
 
-def draw_shield_bar(surf, pct, pct2, p1, p2):
+def draw_shield_bar(surf, pct, pct2):
     if pct & pct2 < 0:
         pct = 0
         pct2 = 0
@@ -398,7 +398,7 @@ def game():
 
         handle_bullets(active_player, dormant_player, player_1_turn)
         draw_window(player1, player2, int(player_1_turn) + 1)
-        draw_shield_bar(WIN, player1.hp, player2.hp, player1, player2)
+        draw_shield_bar(WIN, player1.hp, player2.hp)
 
        
         pygame.draw.rect(WIN, (255, 0, 0), player1.rect, -1)
