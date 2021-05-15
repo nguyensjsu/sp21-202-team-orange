@@ -3,6 +3,10 @@ import sys
 import math
 import pygame
 import os
+from camera import *
+from Bullet import *
+from Player import *
+from Explosion import *
 # Set False if audio works for you; pygame has audio problems on my desktop. -William
 audio_compat = True
 
@@ -33,16 +37,7 @@ GAME_IMAGE = pygame.transform.scale(pygame.image.load(
 MAIN_IMAGE = pygame.transform.scale(pygame.image.load(
     os.path.join("images", "background.jpg")), (WIDTH, HEIGHT))
 
-#explosion animation 
-#load the images into the list
-explosion_anim = {}
-explosion_anim['lg'] = []
-for i in range(9):
-    file = 'regularExplosion0{}.png'.format(i)
-    img = pygame.image.load(os.path.join("images", file))
-    img.set_colorkey(BLACK)
-    img_lg = pygame.transform.scale(img, (72, 72))
-    explosion_anim['lg'].append(img_lg)
+
 
 WIN = pygame.display.set_mode((WIDTH, HEIGHT))
 #MENUSCREEN = pygame.display.set_mode((WIDTH,HEIGHT))
@@ -56,106 +51,6 @@ snow_list = []
 # control fps
 clock = pygame.time.Clock()
 
-
-class Bullet(pygame.sprite.Sprite):
-    def __init__(self, x, y, radius, color):
-        pygame.sprite.Sprite.__init__(self)
-        self.x = x
-        self.y = y
-        self.radius = radius
-        self.dia = 3.14 * self.radius * self.radius
-        self.color = color
-        self.hitbox = pygame.Rect(x, y, self.dia, self.dia)
-        self.hit = False
-        self.power = 0
-        self.angle = 0
-        self.time = 0
-
-    def draw(self, win):
-        pygame.draw.circle(win, (0, 0, 0), (self.x, self.y), self.radius)
-        pygame.draw.circle(win, self.color, (self.x, self.y), self.radius-1)
-
-    #@staticmethod
-    # bullet projectile function
-    def projectilePath(self, x, y):#, x, y):#, power, angle, time):
-        velX = math.cos(self.angle) * self.power
-        velY = math.sin(self.angle) * self.power
-
-        distX = velX * self.time
-        distY = (velY * self.time) + ((-4.9 * (self.time)**2)/2)
-
-        newX = round(distX + x)
-        newY = round(y - distY)
-
-        return newX, newY
-
-
-class Explosion(pygame.sprite.Sprite):
-    def __init__(self, center, size):
-        pygame.sprite.Sprite.__init__(self)
-        self.size = size
-        self.image = explosion_anim[self.size][0]
-        self.rect = self.image.get_rect()
-        self.rect.center = center
-        self.frame = 0
-        self.last_update = pygame.time.get_ticks()
-        self.frame_rate = 50
-
-    def update(self):
-        now = pygame.time.get_ticks()
-        if now - self.last_update > self.frame_rate:
-            self.last_update = now
-            self.frame += 1
-            if self.frame == len(explosion_anim[self.size]):
-                self.kill()
-            else:
-                center = self.rect.center
-                self.image = explosion_anim[self.size][self.frame]
-                self.rect = self.image.get_rect()
-                self.rect.center = center
-
-     
-class Player(pygame.sprite.Sprite):
-    def __init__(self, x, y, image):
-        pygame.sprite.Sprite.__init__(self)
-        self.x = x
-        self.y = y
-        self.hp = 100
-        self.width = 55
-        self.height = 40
-        self.image = pygame.transform.scale(image, (self.width, self.height))
-        self.alpha = 255
-        self.speed = 5
-        self.fuel = 100
-        self.shield = 100
-        self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
-        self.bullet = Bullet(self.x + self.width // 2,
-                             self.y + self.height // 2, 5, RED)
-
-    def move_left(self):
-        if self.x - self.speed > 0 and self.fuel > 0:
-            self.x -= self.speed
-            self.fuel -= self.speed
-            self.bullet.x -= self.speed
-            self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
-
-    def move_right(self):
-        if self.x + self.speed + self.width < WIDTH and self.fuel > 0:
-            self.x += self.speed
-            self.fuel -= self.speed
-            self.bullet.x += self.speed
-            self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
-
-    def reset_bullet(self):
-        # self.bullet = None
-        self.bullet.x = self.x + self.width // 2
-        self.bullet.y = self.y + self.height // 2
-        self.bullet.time = 0
-
-    def new_bullet(self):
-        self.bullet = Bullet(self.x + self.width // 2,
-                             self.y + self.height // 2, 5, RED)
-        return self.x, self.y
 
 
 def handle_bullets(active_player: Player, dormant_player: Player, isPlayer1: bool):
@@ -198,8 +93,9 @@ def draw_winner(text):
     draw_text = WINNER_FONT.render(text, 1, WHITE)
     WIN.blit(draw_text, (WIDTH/2-draw_text.get_width() /
              2, HEIGHT/2 - draw_text.get_height()/2))
+    pygame.time.delay(1500)
     pygame.display.update()
-    #pygame.time.delay(1500)
+    
 
 
 def draw_window(p1, p2, turn):
@@ -352,6 +248,14 @@ def game():
            dormant_player = player2
            active_player.hp = 100
            dormant_player.hp = 100
+
+           bul = active_player.bullet 
+           camera = Camera(bul)
+           follow = Follow(camera,bul)
+           border = Border(camera,bul)
+
+           camera.setmethod(follow)
+
            x = 0
            y = 0
            time = 0
@@ -364,9 +268,10 @@ def game():
         # Update the snow flakes
         if (use_snow):
             draw_snow()
-        print(time, '\n')
+        #print(time, '\n')
         # this now uses state design pattern
         if shoot:
+            camera.scroll()
             if active_player.bullet.y < 362 and not hit_registered:  # bullet is still within frame
                 active_player.bullet.time += 0.25
                 active_player.bullet.x, active_player.bullet.y = active_player.bullet.projectilePath(
