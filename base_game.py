@@ -391,6 +391,8 @@ def game():
         handle_bullets(active_player, dormant_player, player_1_turn)
         draw_window(player1, player2, int(player_1_turn) + 1)
         draw_shield_bar(WIN, player2.hp, player1.hp)
+        draw_text('PLAYER 1', HEALTH_FONT, WHITE, WIN, 10, 30)
+        draw_text('PLAYER 2', HEALTH_FONT, WHITE, WIN, 765, 30)
 
        
         pygame.draw.rect(WIN, (255, 0, 0), player1.rect, -1)
