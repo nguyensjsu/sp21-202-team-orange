@@ -8,7 +8,7 @@ from Bullet import *
 from Player import *
 from Explosion import *
 # Set False if audio works for you; pygame has audio problems on my desktop. -William
-audio_compat = True
+audio_compat = False
 img_dir = path.join(path.dirname(__file__), 'img')
 snd_dir = path.join(path.dirname(__file__), 'snd')
 hero_images = {
@@ -47,6 +47,7 @@ if not audio_compat:
     BULLET_FIRE_SOUND = pygame.mixer.Sound(path.join(snd_dir, 'pew.wav'))
     MAIN_BG_SOUND = pygame.mixer.Sound(path.join(snd_dir, "frozenjam.ogg"))
     GAME_BG_SOUND = pygame.mixer.Sound(path.join(snd_dir, "Game_BG.ogg"))
+    BUTTON_PRESS = pygame.mixer.Sound(path.join(snd_dir, "button.mp3"))
     pygame.mixer.music.set_volume(0.1)
 
 # Backgrounds
@@ -103,6 +104,8 @@ def draw_window(p1, p2, turn):
     # draw projectile
     p1.bullet.draw(WIN)
     p2.bullet.draw(WIN)
+    draw_text("P1",HEALTH_FONT,WHITE,WIN,p1.x+5,p1.y-30)
+    draw_text("P2",HEALTH_FONT,WHITE,WIN,p2.x+5,p2.y-30)
     # draw players
     p1.image.set_alpha(p1.alpha)
     p2.image.set_alpha(p2.alpha)
@@ -227,8 +230,10 @@ def main():
                     pygame.quit()
                     sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
+                BUTTON_PRESS.play()
                 if event.button == 1:
                     click = True
+                
 
         pygame.display.update()
 
