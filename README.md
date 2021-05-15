@@ -24,8 +24,8 @@ The idea for this game project is a multiplayer shooting game where a player has
 # Game demo link
 
 # Team Kanban Board
-![]()
-![]()
-![]()
-![]()
-![]()
+![](img/kb1.png)
+![](img/kb2.png)
+![](img/kb3.png)
+![](img/kb4.png)
+![](img/kb5.png)
