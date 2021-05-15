@@ -16,11 +16,12 @@ hero_images = {
     1 : ("tank.png", None),
     2 : ("jet-plane.png", None),
     3 : ("submarine.png", None),
-    4 : ("spaceship_red.png", None),
-    5 : ("tank2.png", None),
-    6 : ("jet-plane2.png", None),
-    7 : ("submarine2.png", None),
-    8 : ("arm.png", "body.png")
+    4 : ("arm.png", "body.png"),
+    5 : ("spaceship_red.png", None),
+    6 : ("tank2.png", None),
+    7 : ("jet-plane2.png", None),
+    8 : ("submarine2.png", None),
+    9 : ("arm.png", "body.png")
 }
 
 
@@ -252,40 +253,44 @@ def game():
         
         #Resets the gameloop 
         if game_over:
-           show_go_screen()
-           game_over = False
+            show_go_screen()
+            game_over = False
 
-           selector = random.randint(0,3)
-           selector2 = random.randint(4,7)
-           player1 = Player(100, 285, image = pygame.image.load(
-                #path.join(img_dir, hero_images.get(selector2))))
-                path.join(img_dir, "arm.png")), subimg = pygame.image.load(path.join(img_dir, "body.png")))
-           player2 = Player(700, 285, image = pygame.image.load(
-                #path.join(img_dir, hero_images.get(selector))))
-                path.join(img_dir, "arm.png")), subimg = pygame.image.load(path.join(img_dir, "body.png")), player2 = True)
+            p1img = hero_images.get(random.randint(0,4))
+            p2img = hero_images.get(random.randint(5,9))
+            if p1img[1] != None: # if there is a secondary image for the chosen model
+                player1 = Player(100, 285, image = pygame.image.load(path.join(img_dir, p1img[0])), subimg = pygame.image.load(path.join(img_dir, p1img[1])))
+            else:
+                player1 = Player(100, 285, image = pygame.image.load(path.join(img_dir, p1img[0])))
+            
+            if p2img[1] != None:
+                player2 = Player(700, 285, image = pygame.image.load(path.join(img_dir, p2img[0])), subimg = pygame.image.load(path.join(img_dir, p2img[1])), player2 = True)
+            else:
+                player2 = Player(700, 285, image = pygame.image.load(path.join(img_dir, p2img[0])), player2 = True)
+
           
-           all_sprites = pygame.sprite.Group()
-           player_1_turn = True
-           active_player = player1
-           dormant_player = player2
-           active_player.hp = 100
-           dormant_player.hp = 100
+            all_sprites = pygame.sprite.Group()
+            player_1_turn = True
+            active_player = player1
+            dormant_player = player2
+            active_player.hp = 100
+            dormant_player.hp = 100
 
-           bul = active_player.bullet 
-           camera = Camera(bul)
-           follow = Follow(camera,bul)
-           border = Border(camera,bul)
+            bul = active_player.bullet 
+            camera = Camera(bul)
+            follow = Follow(camera,bul)
+            border = Border(camera,bul)
 
 
-           camera.setmethod(follow)
+            camera.setmethod(follow)
 
-           x = 0
-           y = 0
-           time = 0
-           power = 0
-           angle = 0
-           shoot = False
-           hit_registered = False
+            x = 0
+            y = 0
+            time = 0
+            power = 0
+            angle = 0
+            shoot = False
+            hit_registered = False
 
 
         # Update the snow flakes
