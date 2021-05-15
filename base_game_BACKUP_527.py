@@ -12,15 +12,14 @@ audio_compat = True
 img_dir = path.join(path.dirname(__file__), 'img')
 snd_dir = path.join(path.dirname(__file__), 'snd')
 hero_images = {
-    0 : ("spaceship_yellow.png", None),
-    1 : ("tank.png", None),
-    2 : ("jet-plane.png", None),
-    3 : ("submarine.png", None),
-    4 : ("spaceship_red.png", None),
-    5 : ("tank2.png", None),
-    6 : ("jet-plane2.png", None),
-    7 : ("submarine2.png", None),
-    8 : ("arm.png", "body.png")
+    0 : "spaceship_yellow.png",
+    1 : "tank.png",
+    2 : "jet-plane.png",
+    3 : "submarine.png",
+    4 : "spaceship_red.png",
+    5 : "tank2.png",
+    6 : "jet-plane2.png",
+    7 : "submarine2.png"
 }
 
 
@@ -92,13 +91,19 @@ def draw_winner(text):
 def draw_window(p1, p2, turn):
     # draw background
     WIN.blit(GAME_IMAGE, (0, 0))
+    # draw player health bars
+    #p1_health_text = HEALTH_FONT.render("P2 Health: " + str(p1.hp), 1, WHITE)
+    #p2_health_text = HEALTH_FONT.render("P1 Health: " + str(p2.hp), 1, WHITE)
+    #WIN.blit(p1_health_text, (WIDTH - p1_health_text.get_width()-10, 10))
+    #WIN.blit(p2_health_text, ((10, 10)))
+
+    if turn == 1:
+        p1_turn = HEALTH_FONT.render("PLAYER 1's Turn", 1, WHITE)
+        WIN.blit(p1_turn, ((300, 100)))
 
     if turn == 2:
-        turn_text = HEALTH_FONT.render("PLAYER 1's Turn", 1, WHITE)
-    else:
-        turn_text = HEALTH_FONT.render("PLAYER 2's Turn", 1, WHITE)
-
-    WIN.blit(turn_text, ((300, 100)))
+        p2_turn = HEALTH_FONT.render("PLAYER 2's Turn", 1, WHITE)
+        WIN.blit(p2_turn, ((300, 100)))
     # draw projectile
     p1.bullet.draw(WIN)
     p2.bullet.draw(WIN)
@@ -254,16 +259,22 @@ def game():
         if game_over:
            show_go_screen()
            game_over = False
-
+<<<<<<< HEAD
+           player1 = Player(100, 285, image = pygame.image.load(path.join(img_dir, "arm.png")), subimg = pygame.image.load(path.join(img_dir, "body.png")))
+           player2 = Player(700, 285, image = pygame.image.load(path.join(img_dir, "arm.png")), subimg = pygame.image.load(path.join(img_dir, "body.png")), player2 = True)
+||||||| c7ad0cd
+           player1 = Player(700, 300, pygame.image.load(
+                path.join(img_dir, "spaceship_red.png")))
+           player2 = Player(100, 300, pygame.image.load(
+                path.join(img_dir, "spaceship_yellow.png")))
+=======
            selector = random.randint(0,3)
            selector2 = random.randint(4,7)
-           player1 = Player(100, 285, image = pygame.image.load(
-                #path.join(img_dir, hero_images.get(selector2))))
-                path.join(img_dir, "arm.png")), subimg = pygame.image.load(path.join(img_dir, "body.png")))
-           player2 = Player(700, 285, image = pygame.image.load(
-                #path.join(img_dir, hero_images.get(selector))))
-                path.join(img_dir, "arm.png")), subimg = pygame.image.load(path.join(img_dir, "body.png")), player2 = True)
-          
+           player1 = Player(700, 300, pygame.image.load(
+                path.join(img_dir, hero_images.get(selector2))))
+           player2 = Player(100, 300, pygame.image.load(
+                path.join(img_dir, hero_images.get(selector))))
+>>>>>>> 675cdd52fa63404914524fcc209dd09e1d654104
            all_sprites = pygame.sprite.Group()
            player_1_turn = True
            active_player = player1
@@ -353,9 +364,13 @@ def game():
             # not sure how these hit events are meant to happen; collision doesn't seem to work yet
             elif event.type == PLAYER1_HIT or event.type == PLAYER2_HIT:
                 if not hit_registered:
-
+<<<<<<< HEAD
+                    dormant_player.hp -= 34
+||||||| c7ad0cd
+                    dormant_player.hp -= 50
+=======
                     dormant_player.hp -= 20
-
+>>>>>>> 675cdd52fa63404914524fcc209dd09e1d654104
                     if not audio_compat:
                         random.choice(BULLET_HIT_SOUND).play()
                     expl = Explosion( dormant_player.rect.center, 'lg')
@@ -383,7 +398,7 @@ def game():
 
         handle_bullets(active_player, dormant_player, player_1_turn)
         draw_window(player1, player2, int(player_1_turn) + 1)
-        draw_shield_bar(WIN, player2.hp, player1.hp)
+        draw_shield_bar(WIN, player1.hp, player2.hp)
 
        
         pygame.draw.rect(WIN, (255, 0, 0), player1.rect, -1)

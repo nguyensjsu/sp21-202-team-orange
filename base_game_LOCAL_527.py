@@ -11,17 +11,6 @@ from Explosion import *
 audio_compat = True
 img_dir = path.join(path.dirname(__file__), 'img')
 snd_dir = path.join(path.dirname(__file__), 'snd')
-hero_images = {
-    0 : ("spaceship_yellow.png", None),
-    1 : ("tank.png", None),
-    2 : ("jet-plane.png", None),
-    3 : ("submarine.png", None),
-    4 : ("spaceship_red.png", None),
-    5 : ("tank2.png", None),
-    6 : ("jet-plane2.png", None),
-    7 : ("submarine2.png", None),
-    8 : ("arm.png", "body.png")
-}
 
 
 pygame.font.init()
@@ -31,9 +20,6 @@ if not audio_compat:
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 RED = (255, 0, 0)
-GREEN = (0, 255, 0)
-ORANGE = (255, 100, 10)
-
 FPS = 60
 WIDTH, HEIGHT = 900, 500
 HEALTH_FONT = pygame.font.Font("KGHolocene.ttf", 20)
@@ -92,13 +78,19 @@ def draw_winner(text):
 def draw_window(p1, p2, turn):
     # draw background
     WIN.blit(GAME_IMAGE, (0, 0))
+    # draw player health bars
+    p1_health_text = HEALTH_FONT.render("P2 Health: " + str(p1.hp), 1, WHITE)
+    p2_health_text = HEALTH_FONT.render("P1 Health: " + str(p2.hp), 1, WHITE)
+    WIN.blit(p1_health_text, (WIDTH - p1_health_text.get_width()-10, 10))
+    WIN.blit(p2_health_text, ((10, 10)))
+
+    if turn == 1:
+        p1_turn = HEALTH_FONT.render("PLAYER 1's Turn", 1, WHITE)
+        WIN.blit(p1_turn, ((300, 100)))
 
     if turn == 2:
-        turn_text = HEALTH_FONT.render("PLAYER 1's Turn", 1, WHITE)
-    else:
-        turn_text = HEALTH_FONT.render("PLAYER 2's Turn", 1, WHITE)
-
-    WIN.blit(turn_text, ((300, 100)))
+        p2_turn = HEALTH_FONT.render("PLAYER 2's Turn", 1, WHITE)
+        WIN.blit(p2_turn, ((300, 100)))
     # draw projectile
     p1.bullet.draw(WIN)
     p2.bullet.draw(WIN)
@@ -154,33 +146,6 @@ def show_go_screen():
                     main()
             if event.type == pygame.KEYUP:
                 waiting = False
-
-def draw_shield_bar(surf, pct, pct2):
-    if pct & pct2 < 0:
-        pct = 0
-        pct2 = 0
-    BAR_LENGTH = 100
-    BAR_HEIGHT = 10
-    x, y = 5, 5
-    X, Y = (WIDTH - BAR_LENGTH), 5
-    fill = (pct / 100) * BAR_LENGTH
-    fill2 = (pct2 / 100) * BAR_LENGTH
-    outline_rect = pygame.Rect(X, Y, BAR_LENGTH, BAR_HEIGHT)
-    outline_rect2 = pygame.Rect(x, y, BAR_LENGTH, BAR_HEIGHT)
-    fill_rect = pygame.Rect(X, Y, fill, BAR_HEIGHT)
-    fill_rect2 = pygame.Rect(x, y, fill2, BAR_HEIGHT)
-    if pct >= 60:
-       pygame.draw.rect(surf, GREEN, fill_rect)
-       pygame.draw.rect(surf, WHITE, outline_rect, 2)
-    if pct2 >= 60:
-       pygame.draw.rect(surf, GREEN, fill_rect2)
-       pygame.draw.rect(surf, WHITE, outline_rect2, 2)
-    if pct < 60:
-       pygame.draw.rect(surf, ORANGE, fill_rect)
-       pygame.draw.rect(surf, WHITE, outline_rect, 2)
-    if pct2 < 60:
-       pygame.draw.rect(surf, ORANGE, fill_rect2)
-       pygame.draw.rect(surf, WHITE, outline_rect2, 2)
 
 
 
@@ -254,16 +219,8 @@ def game():
         if game_over:
            show_go_screen()
            game_over = False
-
-           selector = random.randint(0,3)
-           selector2 = random.randint(4,7)
-           player1 = Player(100, 285, image = pygame.image.load(
-                #path.join(img_dir, hero_images.get(selector2))))
-                path.join(img_dir, "arm.png")), subimg = pygame.image.load(path.join(img_dir, "body.png")))
-           player2 = Player(700, 285, image = pygame.image.load(
-                #path.join(img_dir, hero_images.get(selector))))
-                path.join(img_dir, "arm.png")), subimg = pygame.image.load(path.join(img_dir, "body.png")), player2 = True)
-          
+           player1 = Player(100, 285, image = pygame.image.load(path.join(img_dir, "arm.png")), subimg = pygame.image.load(path.join(img_dir, "body.png")))
+           player2 = Player(700, 285, image = pygame.image.load(path.join(img_dir, "arm.png")), subimg = pygame.image.load(path.join(img_dir, "body.png")), player2 = True)
            all_sprites = pygame.sprite.Group()
            player_1_turn = True
            active_player = player1
@@ -353,9 +310,7 @@ def game():
             # not sure how these hit events are meant to happen; collision doesn't seem to work yet
             elif event.type == PLAYER1_HIT or event.type == PLAYER2_HIT:
                 if not hit_registered:
-
-                    dormant_player.hp -= 20
-
+                    dormant_player.hp -= 34
                     if not audio_compat:
                         random.choice(BULLET_HIT_SOUND).play()
                     expl = Explosion( dormant_player.rect.center, 'lg')
@@ -383,11 +338,9 @@ def game():
 
         handle_bullets(active_player, dormant_player, player_1_turn)
         draw_window(player1, player2, int(player_1_turn) + 1)
-        draw_shield_bar(WIN, player2.hp, player1.hp)
-
        
-        pygame.draw.rect(WIN, (255, 0, 0), player1.rect, -1)
-        pygame.draw.rect(WIN, (255, 0, 0), player2.rect, -1)
+        pygame.draw.rect(WIN, (255, 0, 0), player1.rect, 2)
+        pygame.draw.rect(WIN, (255, 0, 0), player2.rect, 2)
 
         all_sprites.draw(WIN)
 
@@ -423,7 +376,7 @@ def credit():
         draw_text('Ryan Choy, 014499316', HEALTH_FONT, WHITE, WIN, 50, 100)
         draw_text('Janaarthana Harri, 015246205',
                   HEALTH_FONT, WHITE, WIN, 50, 200)
-        draw_text('Premchand Jayachandran, 015326428', HEALTH_FONT, WHITE, WIN, 50, 300)
+        draw_text('Premchand, 015326428', HEALTH_FONT, WHITE, WIN, 50, 300)
         draw_text('William Su, 013697658', HEALTH_FONT, WHITE, WIN, 50, 400)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
