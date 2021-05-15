@@ -69,25 +69,19 @@ def handle_bullets(active_player: Player, dormant_player: Player, isPlayer1: boo
             active_player.reset_bullet()
 
 
-def findAngle(pos, p1, p2):
-    # player 1
-    s1X = p1.x
-    s1Y = p1.y
-    # player 2
-    s2X = p2.x
-    s2Y = p2.y
+def findAngle(pos, obj):
     try:
-        angle = math.atan((s2Y - pos[1])/(s2X-pos[0]))
+        angle = math.atan((obj.y - pos[1])/(obj.x-pos[0]))
     except:
         angle = math.pi/2
 
-    if pos[1] < s2Y and pos[0] > s2X:
+    if pos[1] < obj.y and pos[0] > obj.x:
         angle = abs(angle)
-    elif pos[1] < s2Y and pos[0] < s2X:
+    elif pos[1] < obj.y and pos[0] < obj.x:
         angle = math.pi - angle
-    elif pos[1] > s2Y and pos[0] < s2X:
-        angle = math.pi - abs(angle)
-    elif pos[1] > s2Y and pos[0] > s2X:
+    elif pos[1] > obj.y and pos[0] < obj.x:
+        angle = math.pi - angle
+    elif pos[1] > obj.y and pos[0] > obj.x:
         angle = (math.pi*2) - angle
     return angle
 
@@ -123,8 +117,8 @@ def draw_window(p1, p2, turn):
     # draw players
     p1.image.set_alpha(p1.alpha)
     p2.image.set_alpha(p2.alpha)
-    WIN.blit(p1.image, (p1.x, p1.y))
-    WIN.blit(p2.image, (p2.x, p2.y))
+    WIN.blit(p1.get_image(), (p1.x, p1.y))
+    WIN.blit(p2.get_image(), (p2.x, p2.y))
 
     # pygame.draw.line(WIN,WHITE,line[0],line[1])
     # pygame.draw.line(WIN,WHITE,line2[0],line2[1])
@@ -271,14 +265,12 @@ def game():
         # Update the snow flakes
         if (use_snow):
             draw_snow()
-        #print(time, '\n')
-        # this now uses state design pattern
         if shoot:
             camera.scroll()
             if active_player.bullet.y < 362 and not hit_registered:  # bullet is still within frame
                 active_player.bullet.time += 0.25
                 active_player.bullet.x, active_player.bullet.y = active_player.bullet.projectilePath(
-                    x, y)#, power, angle, time)  # recalculate bullet location
+                    x, y)
             else:  # bullet has left frame boundary
                 shoot = False
                 hit_registered = False
@@ -294,6 +286,8 @@ def game():
 
         # position of the mouse
         pos = pygame.mouse.get_pos()
+        active_player.angle = findAngle(pos, active_player) / 6.28 * 360
+        print(active_player.angle / 6.28 * 360)
         # invisible line determining the angle of the projectile
         line1 = [(active_player.x + 10, active_player.y + active_player.height // 2 - 2), pos]
         #line2 = [(player2.x + player2.width - 8,
@@ -327,9 +321,9 @@ def game():
 
                     x, y = active_player.new_bullet()
                     active_player.bullet.time = 0
-                    active_player.bullet.power = power = math.sqrt(
+                    active_player.bullet.power = math.sqrt(
                             (line1[1][1] - line1[0][1]) ** 2 + (line1[1][0] - line1[0][0]) ** 2) / 8
-                    active_player.bullet.angle = findAngle(pos, active_player, active_player.bullet)
+                    active_player.bullet.angle = findAngle(pos, active_player.bullet)
 
             # not sure how these hit events are meant to happen; collision doesn't seem to work yet
             elif event.type == PLAYER1_HIT or event.type == PLAYER2_HIT:

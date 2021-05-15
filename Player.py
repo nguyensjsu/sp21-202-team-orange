@@ -15,6 +15,7 @@ class Player(pygame.sprite.Sprite):
         self.speed = 5
         self.fuel = 100
         self.shield = 100
+        self.angle = 0
         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
         self.bullet = Bullet(self.x + self.width // 2,
                              self.y + self.height // 2, 5, RED)
@@ -43,3 +44,8 @@ class Player(pygame.sprite.Sprite):
         self.bullet = Bullet(self.x + self.width // 2,
                              self.y + self.height // 2, 5, RED)
         return self.x, self.y
+    
+    def get_image(self):
+        rotated_image = pygame.transform.rotate(self.image, self.angle)
+        return rotated_image
+    
