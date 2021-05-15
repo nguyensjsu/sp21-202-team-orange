@@ -15,7 +15,11 @@ hero_images = {
     0 : "spaceship_yellow.png",
     1 : "tank.png",
     2 : "jet-plane.png",
-    3 : "submarine.png"
+    3 : "submarine.png",
+    4 : "spaceship_red.png",
+    5 : "tank2.png",
+    6 : "jet-plane2.png",
+    7 : "submarine2.png"
 }
 
 
@@ -242,8 +246,9 @@ def game():
            show_go_screen()
            game_over = False
            selector = random.randint(0,3)
+           selector2 = random.randint(4,7)
            player1 = Player(700, 300, pygame.image.load(
-                path.join(img_dir, "spaceship_red.png")))
+                path.join(img_dir, hero_images.get(selector2))))
            player2 = Player(100, 300, pygame.image.load(
                 path.join(img_dir, hero_images.get(selector))))
            all_sprites = pygame.sprite.Group()
