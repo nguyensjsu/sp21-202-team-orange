@@ -2,10 +2,11 @@ import random
 import sys
 import math
 import pygame
-import os
+from os import path
 # Set False if audio works for you; pygame has audio problems on my desktop. -William
-audio_compat = True
-
+audio_compat = False
+img_dir = path.join(path.dirname(__file__), 'img')
+snd_dir = path.join(path.dirname(__file__), 'snd')
 
 pygame.font.init()
 if not audio_compat:
@@ -16,22 +17,23 @@ BLACK = (0, 0, 0)
 RED = (255, 0, 0)
 FPS = 60
 WIDTH, HEIGHT = 900, 500
-HEALTH_FONT = pygame.font.SysFont("Times New Roman", 40)
-WINNER_FONT = pygame.font.SysFont("Times New Roman", 100)
+HEALTH_FONT = pygame.font.Font("KGHolocene.ttf", 20)
+WINNER_FONT = pygame.font.Font("Public.otf", 100)
 # sound
 if not audio_compat:
-    BULLET_HIT_SOUND = pygame.mixer.Sound(
-        os.path.join("images", "Assets_Grenade+1.mp3"))
-    BULLET_FIRE_SOUND = pygame.mixer.Sound(
-        os.path.join("images", "Assets_Gun+Silencer.mp3"))
-    MAIN_BG_SOUND = pygame.mixer.Sound(os.path.join("images", "Main_BG.ogg"))
-    GAME_BG_SOUND = pygame.mixer.Sound(os.path.join("images", "Game_BG.ogg"))
+    BULLET_HIT_SOUND = []
+    for snd in ['expl3.wav', 'expl6.wav']:
+        BULLET_HIT_SOUND.append(pygame.mixer.Sound(path.join(snd_dir, snd)))
+    BULLET_FIRE_SOUND = pygame.mixer.Sound(path.join(snd_dir, 'pew.wav'))
+    MAIN_BG_SOUND = pygame.mixer.Sound(path.join(snd_dir, "frozenjam.ogg"))
+    GAME_BG_SOUND = pygame.mixer.Sound(path.join(snd_dir, "Game_BG.ogg"))
+    pygame.mixer.music.set_volume(0.1)
 
 # Backgrounds
 GAME_IMAGE = pygame.transform.scale(pygame.image.load(
-    os.path.join("images", "BG.png")), (WIDTH, HEIGHT))
+    path.join(img_dir, "BG.png")), (WIDTH, HEIGHT))
 MAIN_IMAGE = pygame.transform.scale(pygame.image.load(
-    os.path.join("images", "background.jpg")), (WIDTH, HEIGHT))
+    path.join(img_dir, "background.jpg")), (WIDTH, HEIGHT))
 
 #explosion animation 
 #load the images into the list
@@ -39,7 +41,7 @@ explosion_anim = {}
 explosion_anim['lg'] = []
 for i in range(9):
     file = 'regularExplosion0{}.png'.format(i)
-    img = pygame.image.load(os.path.join("images", file))
+    img = pygame.image.load(path.join(img_dir, file))
     img.set_colorkey(BLACK)
     img_lg = pygame.transform.scale(img, (72, 72))
     explosion_anim['lg'].append(img_lg)
@@ -127,7 +129,6 @@ class Player(pygame.sprite.Sprite):
         self.alpha = 255
         self.speed = 5
         self.fuel = 100
-        self.shield = 100
         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
         self.bullet = Bullet(self.x + self.width // 2,
                              self.y + self.height // 2, 5, RED)
@@ -257,8 +258,8 @@ def draw_snow():
 def show_go_screen():
     WIN.blit(MAIN_IMAGE, (0,0))
     draw_text('GAME NAME', HEALTH_FONT, WHITE, WIN, 320, 100)
-    draw_text("A and D to move, Mouse to fire",HEALTH_FONT,WHITE, WIN, 200, 270)
-    draw_text("Press a key to begin",HEALTH_FONT, WHITE, WIN, 270, 350)
+    draw_text("A and D to move, Mouse to fire",HEALTH_FONT,WHITE, WIN, 220, 270)
+    draw_text("Press a key to begin",HEALTH_FONT, WHITE, WIN, 300, 350)
     pygame.display.flip()
     waiting = True
     while waiting:
@@ -299,7 +300,7 @@ def main():
         pygame.draw.rect(WIN, (255, 0, 0), controls_button)
         pygame.draw.rect(WIN, (255, 0, 0), credits_button)
 
-        draw_text('Play', HEALTH_FONT, (255, 255, 255), WIN, 50, 100)
+        draw_text('Start Game', HEALTH_FONT, (255, 255, 255), WIN, 50, 100)
         draw_text('Controls', HEALTH_FONT, (255, 255, 255), WIN, 50, 200)
         draw_text('Credits', HEALTH_FONT, (255, 255, 255), WIN, 50, 300)
 
@@ -343,9 +344,9 @@ def game():
            show_go_screen()
            game_over = False
            player1 = Player(700, 300, pygame.image.load(
-                os.path.join("images", "spaceship_red.png")))
+                path.join(img_dir, "spaceship_red.png")))
            player2 = Player(100, 300, pygame.image.load(
-                os.path.join("images", "spaceship_yellow.png")))
+                path.join(img_dir, "spaceship_yellow.png")))
            all_sprites = pygame.sprite.Group()
            player_1_turn = True
            active_player = player1
@@ -428,7 +429,7 @@ def game():
                 if not hit_registered:
                     dormant_player.hp -= 50
                     if not audio_compat:
-                        BULLET_HIT_SOUND.play()
+                        random.choice(BULLET_HIT_SOUND).play()
                     expl = Explosion( dormant_player.rect.center, 'lg')
                     all_sprites.add(expl)
                     hit_registered = True
