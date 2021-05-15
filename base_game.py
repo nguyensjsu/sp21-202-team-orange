@@ -111,7 +111,7 @@ def draw_window(p1, p2, turn):
     #drawing is now handled by player objects
 
     # update each frame
-    pygame.display.update()
+    
 
 
 
@@ -141,7 +141,7 @@ def draw_snow():
 def show_go_screen():
     WIN.blit(MAIN_IMAGE, (0,0))
     draw_text('GAME NAME', HEALTH_FONT, WHITE, WIN, 320, 100)
-    draw_text("A and D to move, Mouse to fire",HEALTH_FONT,WHITE, WIN, 220, 270)
+    draw_text('A and D to move left and right || Mouse to aim and fire',HEALTH_FONT,WHITE, WIN, 120, 270)
     draw_text("Press a key to begin",HEALTH_FONT, WHITE, WIN, 300, 350)
     pygame.display.flip()
     waiting = True
@@ -183,6 +183,8 @@ def draw_shield_bar(surf, pct, pct2):
        pygame.draw.rect(surf, ORANGE, fill_rect2)
        pygame.draw.rect(surf, WHITE, outline_rect2, 2)
 
+    #pygame.display.update()
+
 
 
 def main():
@@ -207,13 +209,13 @@ def main():
             controls()
         if credits_button.collidepoint((mx, my)) and click:
             credit()
-        pygame.draw.rect(WIN, (255, 0, 0), game_start_button)
-        pygame.draw.rect(WIN, (255, 0, 0), controls_button)
-        pygame.draw.rect(WIN, (255, 0, 0), credits_button)
+        pygame.draw.rect(WIN, BLACK, game_start_button)
+        pygame.draw.rect(WIN, BLACK, controls_button)
+        pygame.draw.rect(WIN, BLACK, credits_button)
 
-        draw_text('Start Game', HEALTH_FONT, (255, 255, 255), WIN, 50, 100)
-        draw_text('Controls', HEALTH_FONT, (255, 255, 255), WIN, 50, 200)
-        draw_text('Credits', HEALTH_FONT, (255, 255, 255), WIN, 50, 300)
+        draw_text('Start Game', HEALTH_FONT, WHITE, WIN, 80, 110)
+        draw_text('Controls', HEALTH_FONT, WHITE, WIN, 100, 210)
+        draw_text('Credits', HEALTH_FONT, WHITE, WIN, 110, 310)
 
         click = False
         for event in pygame.event.get():
@@ -395,6 +397,7 @@ def game():
         pygame.draw.rect(WIN, (255, 0, 0), player2.rect, -1)
 
         all_sprites.draw(WIN)
+        pygame.display.update()
 
     pygame.quit()
 
@@ -405,8 +408,9 @@ def controls():
     
     while running:
         WIN.blit(MAIN_IMAGE, (0,0))
-        draw_text('A and D to move', HEALTH_FONT, WHITE, WIN, 320, 100)
-        draw_text("Mouse to fire",HEALTH_FONT,WHITE, WIN, 320, 100)
+        draw_text('GAME NAME', HEALTH_FONT, WHITE, WIN, 320, 100)
+        draw_text('A and D to move left and right || Mouse to aim and fire', HEALTH_FONT, WHITE, WIN, 120, 400)
+        #draw_text("Mouse to aim and fire",HEALTH_FONT,WHITE, WIN, 520, 400)
         pygame.display.flip()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
