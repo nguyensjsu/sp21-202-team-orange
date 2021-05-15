@@ -11,6 +11,12 @@ from Explosion import *
 audio_compat = True
 img_dir = path.join(path.dirname(__file__), 'img')
 snd_dir = path.join(path.dirname(__file__), 'snd')
+hero_images = {
+    0 : "spaceship_yellow.png",
+    1 : "tank.png",
+    2 : "jet-plane.png",
+    3 : "submarine.png"
+}
 
 
 pygame.font.init()
@@ -235,10 +241,11 @@ def game():
         if game_over:
            show_go_screen()
            game_over = False
+           selector = random.randint(0,3)
            player1 = Player(700, 300, pygame.image.load(
                 path.join(img_dir, "spaceship_red.png")))
            player2 = Player(100, 300, pygame.image.load(
-                path.join(img_dir, "spaceship_yellow.png")))
+                path.join(img_dir, hero_images.get(selector))))
            all_sprites = pygame.sprite.Group()
            player_1_turn = True
            active_player = player1
