@@ -3,7 +3,7 @@
 1. Ryan Choy 014499316
 2. William Su 013697658
 3. Janaarthana Harri 015246205
-4. Premchand
+4. Premchand Jayachandran 015326428
 
 # Contributions
 1. Ryan
@@ -40,6 +40,7 @@ Our project is a multiplayer turn based shooting game where 2 players try to hit
 
 With regards to the physics: the projectile's movement speed and direction depends on the location of the mouse, the further away the mouse is from the player, the faster it will go. Players have a set amount of distance they can travel (energy) in a turn and uses the a and d key on the keyboard to move left and right respectively. The goal of this is to make it harder for the enemy to use the same shot on you two turns in a row. Players would take turns shooting the projectile and when their respective hp goes down to 0, the opponent will win the game. The game will then restart after a few moments.
 
+Game Flow
 ![](img/Start_Screen.png)
 ![](img/Game_Screen1.png)
 ![](img/Game_Screen2.png)
