@@ -24,7 +24,7 @@
  - Added fuel consumption feature
  - Logic for intelligent image import and process based on player1/player2
 3. Janaarthana
- - ackground images and sound.
+ - Background images and sound.
  - Player hit animation.
  - Screen transition after the game ends, continue to play again or quit.
  - Health bar created for both players.
