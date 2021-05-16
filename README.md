@@ -43,7 +43,7 @@ With regards to the physics: the projectile's movement speed and direction depen
 # Architectural diagram
 class diagram
 
-![](activity_diagram.png)
+![](img/activity_diagram.png)
 
 sequence diagram
 
