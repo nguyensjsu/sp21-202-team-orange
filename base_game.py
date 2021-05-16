@@ -61,7 +61,9 @@ WIN = pygame.display.set_mode((WIDTH, HEIGHT))
 PLAYER1_HIT = pygame.USEREVENT + 1
 PLAYER2_HIT = pygame.USEREVENT + 2
 
-pygame.display.set_caption("Worms")
+pygame.display.set_caption("Wacky 1v1")
+logo = pygame.image.load(path.join(img_dir, "spaceship_red_32x32.png"))
+pygame.display.set_icon(logo)
 use_snow = True
 snow_list = []
 # control fps
@@ -143,7 +145,7 @@ def draw_snow():
 
 def show_go_screen():
     WIN.blit(MAIN_IMAGE, (0,0))
-    draw_text('GAME NAME', HEALTH_FONT, WHITE, WIN, 320, 100)
+    draw_text('Wacky 1V1', HEALTH_FONT, WHITE, WIN, 320, 100)
     draw_text('A and D to move left and right || Mouse to aim and fire',HEALTH_FONT,WHITE, WIN, 120, 270)
     draw_text("Press a key to begin",HEALTH_FONT, WHITE, WIN, 300, 350)
     pygame.display.flip()
