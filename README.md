@@ -67,6 +67,7 @@ Sequence diagram (Screen transitions)
 https://drive.google.com/file/d/1wYUqsaa9ga4DUV21WwI_oNY2vwTyPHrK/view?usp=sharing
  
 # Game demo link
+https://drive.google.com/file/d/1AfEwFopfrOpO2LxU6CB1HCB6CVRMn6p7/view?usp=sharing
 
 # Team Kanban Board
 ![](img/kb1.png)
