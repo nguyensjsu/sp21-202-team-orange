@@ -41,11 +41,11 @@ Our project is a multiplayer turn based shooting game where 2 players try to hit
 With regards to the physics: the projectile's movement speed and direction depends on the location of the mouse, the further away the mouse is from the player, the faster it will go. Players have a set amount of distance they can travel (energy) in a turn and uses the a and d key on the keyboard to move left and right respectively. The goal of this is to make it harder for the enemy to use the same shot on you two turns in a row. Players would take turns shooting the projectile and when their respective hp goes down to 0, the opponent will win the game. The game will then restart after a few moments.
 
 # Architectural diagram
-class diagram
+Class diagram
 
 ![](img/class_diagram.png)
 
-sequence diagram
+Sequence diagram
 
 ![]()
 
