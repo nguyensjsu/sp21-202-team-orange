@@ -15,6 +15,12 @@
 The idea for this game project is a multiplayer shooting game where a player has to use the mouse to shoot a projectile. The projectile's movement speed and direction depends on the location of the mouse, the further away the mouse is from the player, the faster it will go. Players have a set amount of distance they can travel in a turn and uses the a and d key on the keyboard to move left and right respectively. Players would take turns shooting the projectile and when their respective hp goes down to 0, the opponent will win the game. The game will then restart after a few moments.
 
 # Architectural diagram
+Class Diagram:
+
+![](img/class_diagram.png)
+
+Sequence Diagram:
+
 ![]()
 
 # Key Features
