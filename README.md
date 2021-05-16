@@ -34,7 +34,6 @@
  - Used the collision detection to reduce the hp to reduce the player's health.
  - Added multiple model images for the player and made the model random at the start of the game.
 
-
 # Summary
 This project uses the pygame library to create dynamic images and interactions between each other. The code used are all python code.
 
@@ -65,7 +64,8 @@ Sequence diagram (Screen transitions)
 5. Characters model change its direction based on the position of the mouse
 
 # Youtube Ad link
-
+https://drive.google.com/file/d/1wYUqsaa9ga4DUV21WwI_oNY2vwTyPHrK/view?usp=sharing
+ 
 # Game demo link
 
 # Team Kanban Board
