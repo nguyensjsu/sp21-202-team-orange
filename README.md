@@ -75,3 +75,7 @@ https://drive.google.com/file/d/1AfEwFopfrOpO2LxU6CB1HCB6CVRMn6p7/view?usp=shari
 ![](img/kb3.png)
 ![](img/kb4.png)
 ![](img/kb5.png)
+
+# Agile Videos
+Standup 5/12: https://drive.google.com/file/d/1_lVNL9Ih_BaKY4cWFiZS4aM8MGdaw2ix/view?usp=sharing
+Retrospective 5/15: https://drive.google.com/file/d/1XWHBffBMHCjZVvPEG5DNoGa6q4W3jLbG/view?usp=sharing
