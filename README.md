@@ -53,7 +53,7 @@ Class diagram
 
 ![](img/class_diagram.png)
 
-Sequence diagram (flow of the game)
+Sequence diagram (Screen transitions)
 
 ![](img/sd.png)
 
