@@ -63,7 +63,7 @@ Sequence diagram (Screen transitions)
 4. Dynamic pixel elements imitating snow fall
 5. Characters model change its direction based on the position of the mouse
 
-# Youtube Ad link
+# Game Ad link
 https://drive.google.com/file/d/1wYUqsaa9ga4DUV21WwI_oNY2vwTyPHrK/view?usp=sharing
  
 # Game demo link
