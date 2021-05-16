@@ -7,9 +7,33 @@
 
 # Contributions
 1. Ryan
+ - Made base game
+ - Added bullet projectile feature
+ - Added screens (Home page, Controls page, Credits page, Game Page)
+ - Added screen transitions
+ - Made game turn based (Player 1 goes first, then Player 2 and vice versa)
+ - Start screen background image
+ - Bug fixes + minor QOL features 
 2. William
+ - Ensured clean code by moving utility functions into the classes that used them instead of just hanging around the main code
+ - Optimized bullet physics for correctness and performance
+ - Created system to rotate an image around its center
+ - Used system to have active sprites follow cursor
+ - Expanded Player class and Bullet class attributes for further functionality
+ - Optimized game loop logic to be cleaner and less verbose (less conditionals using the active_player and dormant_player system)
+ - Added fuel consumption feature
+ - Logic for intelligent image import and process based on player1/player2
 3. Janaarthana
+ - ackground images and sound.
+ - Player hit animation.
+ - Screen transition after the game ends, continue to play again or quit.
+ - Health bar created for both players.
+ - Snowfall map created.
 4. Premchand
+ - Added the collision detection feature to detect collision between the object and projectile
+ - Used the collision detection to reduce the hp to reduce the player's health.
+ - Added multiple model images for the player and made the model random at the start of the game.
+
 
 # Summary
 Our project is a multiplayer turn based shooting game where 2 players try to hit each other with a physics projectile. This idea came about due to the recent EOLing of adobe flash player. Many of us had grown up playing adobe flash games with very similar premises - and with Flash's EOL just passed, we wanted to create a tribute to those somewhat crude 2D physics games of our childhoods. With that in mind, we included many hallmarks of that particular genre of game - stock art backgrounds, inconsistent sprite choices, and simplistic gameplay mechanics. While perhaps not as involved as we had originally intended, we believe our project reflects that experience rather well.
