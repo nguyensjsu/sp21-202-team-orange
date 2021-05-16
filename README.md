@@ -53,9 +53,9 @@ Class diagram
 
 ![](img/class_diagram.png)
 
-Sequence diagram
+Sequence diagram (flow of the game)
 
-![]()
+![](img/sd.png)
 
 # Key Features
 1. Speed and angle of projectile based on location of mouse
